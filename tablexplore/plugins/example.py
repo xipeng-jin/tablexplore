@@ -25,7 +25,7 @@ import pickle, gzip
 from collections import OrderedDict
 from tablexplore.qt import *
 import pandas as pd
-from tablexplore import util, data, core, dialogs
+from tablexplore import util, dataset, core, dialogs
 from tablexplore.plugin import Plugin
 
 class ExamplePlugin(Plugin):

@@ -25,7 +25,7 @@ import pickle, gzip
 from collections import OrderedDict
 from tablexplore.qt import *
 import pandas as pd
-from tablexplore import util, data, core, dialogs
+from tablexplore import util, dataset, core, dialogs
 from tablexplore.plugin import Plugin
 
 class ExamplePlugin(Plugin):
@@ -93,7 +93,7 @@ class ExamplePlugin(Plugin):
         """Test plotting"""
 
         self.tablewidget.pf = self.table.pf
-        df = data.getSampleData(100,4)
+        df = dataset.getSampleData(100,4)
         self.tablewidget.table.model.df = df
         self.tablewidget.refresh()
         self.tablewidget.selectAll()
@@ -115,7 +115,7 @@ class ExamplePlugin(Plugin):
     def tableTests(self):
         """Test table functions"""
 
-        df = data.getSampleData(500,5)
+        df = dataset.getSampleData(500,5)
         self.tablewidget.table.model.df = df
         self.tablewidget.refresh()
         return

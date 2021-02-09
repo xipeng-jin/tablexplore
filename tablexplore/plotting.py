@@ -1328,7 +1328,7 @@ class BaseOptions(object):
     def applyOptions(self):
         """Set the plot kwd arguments from the widgets"""
 
-        self.kwds = getWidgetValues(self.widgets)
+        self.kwds = get_widget_values(self.widgets)
         return
 
     def apply(self):
@@ -1345,8 +1345,8 @@ class BaseOptions(object):
             wrap: wrap for internal widgets
         """
 
-        dialog, self.widgets = dialogFromOptions(parent, self.opts, self.groups,
-                                wrap=wrap, section_wrap=section_wrap, style=style)
+        dialog, self.widgets = dialog_from_options(parent, self.opts, self.groups, wrap=wrap, section_wrap=section_wrap,
+                                                   style=style)
         return dialog
 
     def setWidgetValue(self, key, value):

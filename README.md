@@ -60,9 +60,9 @@ from PySide2.QtGui import *
 import pandas as pd
 from tablexplore import data, core, plotting, interpreter
 
+
 class TestApp(QMainWindow):
     def __init__(self, project_file=None, csv_file=None):
-
         QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("Example")
@@ -70,15 +70,17 @@ class TestApp(QMainWindow):
         self.main = QWidget()
         self.setCentralWidget(self.main)
         layout = QVBoxLayout(self.main)
-        df = data.getSampleData()
-        t = core.DataFrameWidget(self.main,dataframe=df)
+        df = data.get_sample_data()
+        t = core.DataFrameWidget(self.main, dataframe=df)
         layout.addWidget(t)
-        #show a Python interpreter
+        # show a Python interpreter
         t.showInterpreter()
         return
 
+
 if __name__ == '__main__':
     import sys
+
     app = QApplication(sys.argv)
     aw = TestApp()
     aw.show()

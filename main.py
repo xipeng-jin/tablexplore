@@ -23,27 +23,30 @@
 from PySide2.QtWidgets import *
 from tablexplore import app
 
+
 def main():
-    import sys, os
+    import sys
+    import os
 
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    #parser.add_argument("-f", "--file", dest="msgpack",
-    #                    help="Open a dataframe as msgpack", metavar="FILE")
+    # parser.add_argument("-f", "--file", dest="msgpack",
+    #                     help="Open a dataframe as msgpack", metavar="FILE")
     parser.add_argument("-p", "--project", dest="project_file",
                         help="Open a dataexplore project file", metavar="FILE")
     parser.add_argument("-i", "--csv", dest="csv_file",
                         help="Import a csv file", metavar="FILE")
-    #parser.add_argument("-x", "--excel", dest="excel",
-    #                    help="Import an excel file", metavar="FILE")
-    #parser.add_argument("-t", "--test", dest="test",  action="store_true",
-    #                    default=False, help="Run a basic test app")
+    # parser.add_argument("-x", "--excel", dest="excel",
+    #                     help="Import an excel file", metavar="FILE")
+    # parser.add_argument("-t", "--test", dest="test",  action="store_true",
+    #                     default=False, help="Run a basic test app")
     args, unknown = parser.parse_known_args()
     args = vars(args)
     qapp = QApplication(sys.argv)
     aw = app.Application(**args)
     aw.show()
     qapp.exec_()
+
 
 if __name__ == '__main__':
     main()

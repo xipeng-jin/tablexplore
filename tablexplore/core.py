@@ -27,11 +27,12 @@ import pandas as pd
 from pandas.api.types import is_datetime64_any_dtype as is_datetime
 import string
 from .qt import *
+from . import dialogs, plotting, util
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 iconpath = os.path.join(module_path, 'icons')
 textalignment = None
-MODES = ['default','spreadsheet','locked']
+MODES = ['default', 'spreadsheet', 'locked']
 FONT = 'monospace'
 FONTSIZE = 12
 FONTSTYLE = ''
@@ -43,40 +44,43 @@ try:
 except AttributeError:
     def _fromUtf8(s):
         return s
-from . import dialogs, plotting, util
 
 icons = {'load': 'open', 'save': 'export',
          'importexcel': 'excel',
          'copy': 'copy', 'paste': 'paste',
-         'plot':'plot',
-         'transpose':'transpose',
-         'aggregate':'aggregate',
+         'plot': 'plot',
+         'transpose': 'transpose',
+         'aggregate': 'aggregate',
          'pivot': 'pivot',
-         'melt':'melt', 'merge':'merge',
-         'filter':'table-filter',
-         'interpreter':'interpreter',
-         'subtable':'subtable','clear':'clear'
+         'melt': 'melt', 'merge': 'merge',
+         'filter': 'table-filter',
+         'interpreter': 'interpreter',
+         'subtable': 'subtable', 'clear': 'clear'
          }
 
-timeformats = ['infer','%d/%m/%Y','%d/%m/%y',
-                '%Y/%m/%d','%y/%m/%d','%Y/%d/%m',
-                '%d%m%Y','%Y%m%d','%Y%d%m',
-                '%d-%b-%Y',
-                '%Y-%m-%d %H:%M:%S','%Y-%m-%d %H:%M',
-                '%d-%m-%Y %H:%M:%S','%d-%m-%Y %H:%M']
+timeformats = ['infer', '%d/%m/%Y', '%d/%m/%y',
+               '%Y/%m/%d', '%y/%m/%d', '%Y/%d/%m',
+               '%d%m%Y', '%Y%m%d', '%Y%d%m',
+               '%d-%b-%Y',
+               '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M',
+               '%d-%m-%Y %H:%M:%S', '%d-%m-%Y %H:%M']
+
 
 class ColumnHeader(QHeaderView):
     def __init__(self):
         super(QHeaderView, self).__init__()
         return
 
+
 class RowHeader(QHeaderView):
     def __init__(self):
         super(QHeaderView, self).__init__()
         return
 
+
 class DataFrameWidget(QWidget):
     """Widget containing a tableview and toolbars"""
+
     def __init__(self, parent=None, dataframe=None, app=None,
                  toolbar=True, statusbar=True, **kwargs):
 
@@ -84,13 +88,13 @@ class DataFrameWidget(QWidget):
         self.splitter = QSplitter(QtCore.Qt.Vertical, self)
         l = self.layout = QGridLayout()
         l.setSpacing(2)
-        l.addWidget(self.splitter,1,1)
+        l.addWidget(self.splitter, 1, 1)
         self.table = DataFrameTable(self, dataframe, **kwargs)
         self.splitter.addWidget(self.table)
-        self.splitter.setSizes((500,200))        
-        if toolbar == True:
+        self.splitter.setSizes((500, 200))
+        if toolbar:
             self.createToolbar()
-        if statusbar == True:
+        if statusbar:
             self.statusBar()
         self.pf = None
         self.app = app
@@ -102,7 +106,7 @@ class DataFrameWidget(QWidget):
         self.table.model.dataChanged.connect(self.stateChanged)
         return
 
-    #@Slot('QModelIndex','QModelIndex','int')
+    # @Slot('QModelIndex','QModelIndex','int')
     def stateChanged(self, idx, idx2):
         """Run whenever table model is changed"""
 
@@ -126,33 +130,33 @@ class DataFrameWidget(QWidget):
         """Create toolbar"""
 
         self.setLayout(self.layout)
-        items = {'load': {'action': self.load,'file':'open'},
-                 'importexcel': {'action':self.importExcel,'file':'excel'},
-                 'copy': {'action':self.copy,'file':'copy','shortcut':'Ctrl+C'},
-                 'paste': {'action':self.paste,'file':'paste','shortcut':'Ctrl+V'},
-                 'insert': {'action':self.insert,'file':'table-insert'},
-                 'plot': {'action':self.plot,'file':'plot'},
-                 'transpose': {'action':self.transpose,'file':'transpose'},
-                 'aggregate': {'action':self.aggregate,'file':'aggregate'},
-                 'pivot': {'action':self.pivot,'file':'pivot'},
-                 'melt': {'action':self.melt,'file':'melt'},
-                 'merge': {'action':self.merge,'file':'merge'},
-                 'filter':{'action':self.filter,'file':'table-filter'},
-                 'interpreter': {'action':self.showInterpreter  ,'file':'interpreter'},
-                 'subtable': {'action':self.subTableFromSelection,'file':'subtable'},
-                 'clear': {'action':self.clear,'file':'clear'},
+        items = {'load': {'action': self.load, 'file': 'open'},
+                 'importexcel': {'action': self.import_excel, 'file': 'excel'},
+                 'copy': {'action': self.copy, 'file': 'copy', 'shortcut': 'Ctrl+C'},
+                 'paste': {'action': self.paste, 'file': 'paste', 'shortcut': 'Ctrl+V'},
+                 'insert': {'action': self.insert, 'file': 'table-insert'},
+                 'plot': {'action': self.plot, 'file': 'plot'},
+                 'transpose': {'action': self.transpose, 'file': 'transpose'},
+                 'aggregate': {'action': self.aggregate, 'file': 'aggregate'},
+                 'pivot': {'action': self.pivot, 'file': 'pivot'},
+                 'melt': {'action': self.melt, 'file': 'melt'},
+                 'merge': {'action': self.merge, 'file': 'merge'},
+                 'filter': {'action': self.filter, 'file': 'table-filter'},
+                 'interpreter': {'action': self.showInterpreter, 'file': 'interpreter'},
+                 'subtable': {'action': self.subTableFromSelection, 'file': 'subtable'},
+                 'clear': {'action': self.clear, 'file': 'clear'},
                  }
 
         toolbar = QToolBar("Toolbar")
         toolbar.setOrientation(QtCore.Qt.Vertical)
         dialogs.addToolBarItems(toolbar, self, items)
-        self.layout.addWidget(toolbar,1,2)
+        self.layout.addWidget(toolbar, 1, 2)
         return
 
     def applySettings(self, settings):
         """Settings"""
 
-        #self.table.setFont(font)
+        # self.table.setFont(font)
         return
 
     def close(self):
@@ -174,7 +178,7 @@ class DataFrameWidget(QWidget):
             return
         df = self.table.model.df
         meminfo = self.table.getMemory()
-        s = '{r} rows x {c} columns | {m}'.format(r=len(df), c=len(df.columns),m=meminfo)
+        s = '{r} rows x {c} columns | {m}'.format(r=len(df), c=len(df.columns), m=meminfo)
         self.size_label.setText(s)
         return
 
@@ -184,14 +188,14 @@ class DataFrameWidget(QWidget):
     def save(self):
         return
 
-    def importFile(self, filename=None, dialog=True, **kwargs):
+    def import_csv(self, filename=None, dialog=True, **kwargs):
         """Import csv file"""
 
-        if dialog is True and filename == None:
+        if dialog is True and filename is None:
             options = QFileDialog.Options()
-            filename, _ = QFileDialog.getOpenFileName(self,"Import File",
-                                 "","CSV files (*.csv);;Text Files (*.txt);;All Files (*)",
-                                 options=options)
+            filename, _ = QFileDialog.getOpenFileName(self, "Import File",
+                                                      "", "CSV files (*.csv);;Text Files (*.txt);;All Files (*)",
+                                                      options=options)
             if not filename:
                 return
             dlg = dialogs.ImportDialog(self, filename)
@@ -200,18 +204,18 @@ class DataFrameWidget(QWidget):
                 return
             self.table.model.df = dlg.df
             self.refresh()
-        elif filename != None:
+        elif filename is not None:
             self.table.model.df = pd.read_csv(filename)
             self.refresh()
         return
 
-    def importExcel(self):
+    def import_excel(self):
         """Import excel file"""
 
         options = QFileDialog.Options()
-        filename, _ = QFileDialog.getOpenFileName(self,"Import Excel",
-                             "","xlsx files (*.xlsx);;xls Files (*.xls);;All Files (*)",
-                             options=options)
+        filename, _ = QFileDialog.getOpenFileName(self, "Import Excel",
+                                                  "", "xlsx files (*.xlsx);;xls Files (*.xls);;All Files (*)",
+                                                  options=options)
         if filename:
             self.table.model.df = pd.read_excel(filename)
             self.refresh()
@@ -221,9 +225,9 @@ class DataFrameWidget(QWidget):
         """Import hdf5 file"""
 
         options = QFileDialog.Options()
-        filename, _ = QFileDialog.getOpenFileName(self,"Import Excel",
-                             "","hdf files (*.hdf5);;All Files (*)",
-                             options=options)
+        filename, _ = QFileDialog.getOpenFileName(self, "Import Excel",
+                                                  "", "hdf files (*.hdf5);;All Files (*)",
+                                                  options=options)
         if filename:
             self.table.model.df = pd.read_hdf(filename, **kwargs)
             self.refresh()
@@ -232,11 +236,11 @@ class DataFrameWidget(QWidget):
     def importURL(self, recent):
         """Import hdf5 file"""
 
-        delimiters = [',',r'\t',' ',';','/','&','|','^','+','-']
-        opts = {'url':{'label':'Address','type':'combobox','default':'',
-                     'items':recent, 'editable': True, 'width':600 },
-                'sep':{'label':'Delimeter','type':'combobox','default':'',
-                    'items':delimiters,'width':200}
+        delimiters = [',', r'\t', ' ', ';', '/', '&', '|', '^', '+', '-']
+        opts = {'url': {'label': 'Address', 'type': 'combobox', 'default': '',
+                        'items': recent, 'editable': True, 'width': 600},
+                'sep': {'label': 'Delimeter', 'type': 'combobox', 'default': '',
+                        'items': delimiters, 'width': 200}
                 }
         dlg = dialogs.MultipleInputDialog(self, opts, title='Import URL', width=600)
         dlg.exec_()
@@ -253,9 +257,10 @@ class DataFrameWidget(QWidget):
 
         options = QFileDialog.Options()
         options.setDefaultSuffix('csv')
-        filename, _ = QFileDialog.getSaveFileName(self,"Export",
-                             "","csv files (*.csv);;xlsx files (*.xlsx);;xls Files (*.xls);;All Files (*)",
-                             options=options)
+        filename, _ = QFileDialog.getSaveFileName(self, "Export",
+                                                  "",
+                                                  "csv files (*.csv);;xlsx files (*.xlsx);;xls Files (*.xls);;All Files (*)",
+                                                  options=options)
         if not filename:
             return
         df = self.table.model.df
@@ -274,7 +279,7 @@ class DataFrameWidget(QWidget):
 
         self.table.storeCurrent()
         self.table.model.df = pd.read_clipboard(sep='\t', index_col=0)
-                                #parse_dates=True, infer_datetime_format=True)
+        # parse_dates=True, infer_datetime_format=True)
         self.refresh()
         return
 
@@ -311,7 +316,7 @@ class DataFrameWidget(QWidget):
         """Table info"""
 
         buf = io.StringIO()
-        self.table.model.df.info(verbose=True,buf=buf,memory_usage=True)
+        self.table.model.df.info(verbose=True, buf=buf, memory_usage=True)
         td = dialogs.TextDialog(self, buf.getvalue(), 'Info', width=600, height=400)
         return
 
@@ -337,12 +342,12 @@ class DataFrameWidget(QWidget):
         df = self.table.model.df
         cols = df.columns
 
-        opts = {'remove':  {'type':'checkbox','default':0,'label':'Drop duplicates',
-                'tooltip':'Remove duplicates'},
-                'useselected':  {'type':'checkbox','default':0,'label':'Use selected columns' },
-                'keep':{'label':'Keep','type':'combobox','default':'first',
-                             'items':['first','last'], 'tooltip':'values to keep'},
-                'inplace':{'type':'checkbox','default':0,'label':'In place' },
+        opts = {'remove': {'type': 'checkbox', 'default': 0, 'label': 'Drop duplicates',
+                           'tooltip': 'Remove duplicates'},
+                'useselected': {'type': 'checkbox', 'default': 0, 'label': 'Use selected columns'},
+                'keep': {'label': 'Keep', 'type': 'combobox', 'default': 'first',
+                         'items': ['first', 'last'], 'tooltip': 'values to keep'},
+                'inplace': {'type': 'checkbox', 'default': 0, 'label': 'In place'},
                 }
         dlg = dialogs.MultipleInputDialog(self, opts, title='Clean Data')
         dlg.exec_()
@@ -358,13 +363,13 @@ class DataFrameWidget(QWidget):
         else:
             cols = df.columns
 
-        new = df[df.duplicated(subset=cols,keep=keep)]
+        new = df[df.duplicated(subset=cols, keep=keep)]
         if remove == True:
-            new = df.drop_duplicates(subset=cols,keep=keep)
+            new = df.drop_duplicates(subset=cols, keep=keep)
             if inplace == True:
                 self.table.model.df = new
                 self.refresh()
-            elif len(new)>0:
+            elif len(new) > 0:
                 self.showSubTable(new)
         else:
             self.showSubTable(new)
@@ -375,27 +380,27 @@ class DataFrameWidget(QWidget):
 
         df = self.table.model.df
         cols = df.columns
-        fillopts = ['fill scalar','','ffill','bfill','interpolate']
-        opts = {'replace':{'label':'Replace','type':'entry','default':'',
-                             'tooltip':'replace with'},
-                'symbol':{'label':'Fill empty/replace with','type':'combobox','default':'',
-                             'items':['',0,'null','-','x'], 'editable': True, 'tooltip':'seperator'},
-                'method':{'label':'Fill missing method','type':'combobox','default':'',
-                                     'items':fillopts, 'tooltip':''},
-                'limit':  {'type':'checkbox','default':1,'label':'Limit gaps',
-                                'tooltip':' '},
-                'dropcols':  {'type':'checkbox','default':0,'label':'Drop columns with null data',
-                                'tooltip':' '},
-                'droprows':  {'type':'checkbox','default':0,'label':'Drop rows with null data',
-                                'tooltip':' '},
-                'how':{'label':'Drop method','type':'combobox','default':'',
-                             'items':['any','all'], 'tooltip':''},
-                'dropduplicatecols':  {'type':'checkbox','default':0,'label':'Drop duplicate columns',
-                                'tooltip':' '},
-                'dropduplicaterows':  {'type':'checkbox','default':0,'label':'Drop duplicate rows',
-                                'tooltip':' '},
-                'rounddecimals':  {'type':'spinbox','default':0,'label':'Round Numbers',
-                                'tooltip':' '},
+        fillopts = ['fill scalar', '', 'ffill', 'bfill', 'interpolate']
+        opts = {'replace': {'label': 'Replace', 'type': 'entry', 'default': '',
+                            'tooltip': 'replace with'},
+                'symbol': {'label': 'Fill empty/replace with', 'type': 'combobox', 'default': '',
+                           'items': ['', 0, 'null', '-', 'x'], 'editable': True, 'tooltip': 'seperator'},
+                'method': {'label': 'Fill missing method', 'type': 'combobox', 'default': '',
+                           'items': fillopts, 'tooltip': ''},
+                'limit': {'type': 'checkbox', 'default': 1, 'label': 'Limit gaps',
+                          'tooltip': ' '},
+                'dropcols': {'type': 'checkbox', 'default': 0, 'label': 'Drop columns with null data',
+                             'tooltip': ' '},
+                'droprows': {'type': 'checkbox', 'default': 0, 'label': 'Drop rows with null data',
+                             'tooltip': ' '},
+                'how': {'label': 'Drop method', 'type': 'combobox', 'default': '',
+                        'items': ['any', 'all'], 'tooltip': ''},
+                'dropduplicatecols': {'type': 'checkbox', 'default': 0, 'label': 'Drop duplicate columns',
+                                      'tooltip': ' '},
+                'dropduplicaterows': {'type': 'checkbox', 'default': 0, 'label': 'Drop duplicate rows',
+                                      'tooltip': ' '},
+                'rounddecimals': {'type': 'spinbox', 'default': 0, 'label': 'Round Numbers',
+                                  'tooltip': ' '},
                 }
 
         dlg = dialogs.MultipleInputDialog(self, opts, title='Clean Data')
@@ -419,9 +424,9 @@ class DataFrameWidget(QWidget):
             else:
                 df = df.fillna(symbol)
         if kwds['dropcols'] == 1:
-            df = df.dropna(axis=1,how=kwds['how'])
+            df = df.dropna(axis=1, how=kwds['how'])
         if kwds['droprows'] == 1:
-            df = df.dropna(axis=0,how=kwds['how'])
+            df = df.dropna(axis=0, how=kwds['how'])
         if method == '':
             pass
         elif method == 'fill scalar':
@@ -433,12 +438,12 @@ class DataFrameWidget(QWidget):
         if kwds['dropduplicaterows'] == 1:
             df = df.drop_duplicates()
         if kwds['dropduplicatecols'] == 1:
-            df = df.loc[:,~df.columns.duplicated()]
+            df = df.loc[:, ~df.columns.duplicated()]
         if kwds['rounddecimals'] != 0:
             df = df.round(rounddecimals)
 
         self.table.model.df = df
-        #print (df)
+        # print (df)
         self.refresh()
         return
 
@@ -448,18 +453,18 @@ class DataFrameWidget(QWidget):
         df = self.table.model.df
         idx = self.table.getSelectedColumns()
 
-        types = ['float','int']
-        opts = {'convert to':  {'type':'combobox','default':'int','items':types,'label':'Convert To',
-                                        'tooltip':' '},
-                'removetext':  {'type':'checkbox','default':0,'label':'Try to remove text',
-                                                        'tooltip':' '},
-                'convert currency':  {'type':'checkbox','default':0,'label':'Convert currency',
-                                                        'tooltip':' '},
-                'selected columns only':  {'type':'checkbox','default':0,'label':'Selected columns only',
-                                                        'tooltip':' '},
-                'fillempty':  {'type':'checkbox','default':0,'label':'Fill Empty',
-                                                        'tooltip':' '},
-               }
+        types = ['float', 'int']
+        opts = {'convert to': {'type': 'combobox', 'default': 'int', 'items': types, 'label': 'Convert To',
+                               'tooltip': ' '},
+                'removetext': {'type': 'checkbox', 'default': 0, 'label': 'Try to remove text',
+                               'tooltip': ' '},
+                'convert currency': {'type': 'checkbox', 'default': 0, 'label': 'Convert currency',
+                                     'tooltip': ' '},
+                'selected columns only': {'type': 'checkbox', 'default': 0, 'label': 'Selected columns only',
+                                          'tooltip': ' '},
+                'fillempty': {'type': 'checkbox', 'default': 0, 'label': 'Fill Empty',
+                              'tooltip': ' '},
+                }
         dlg = dialogs.MultipleInputDialog(self, opts, title='Convert Numeric')
         dlg.exec_()
         if not dlg.accepted:
@@ -471,20 +476,20 @@ class DataFrameWidget(QWidget):
         useselected = kwds['selected columns only']
         fillempty = kwds['fillempty']
 
-        if useselected == 1 and len(idx)>0:
+        if useselected == 1 and len(idx) > 0:
             colnames = df.columns[idx]
         else:
             colnames = df.columns
-        print (idx,colnames)
+        print(idx, colnames)
         self.table.storeCurrent()
         for c in colnames:
             x = df[c]
             if fillempty == 1 or convtype is int:
                 x = x.fillna(0)
             if currency == 1:
-                x = x.replace( '[\$\£\€,)]','', regex=True ).replace( '[(]','-', regex=True )
+                x = x.replace('[\$\£\€,)]', '', regex=True).replace('[(]', '-', regex=True)
             if removetext == 1:
-                x = x.replace( '[^\d.]+', '', regex=True)
+                x = x.replace('[^\d.]+', '', regex=True)
             try:
                 self.table.model.df[c] = pd.to_numeric(x, errors='coerce').astype(convtype)
             except:
@@ -504,12 +509,12 @@ class DataFrameWidget(QWidget):
         """Reformat column names"""
 
         df = self.table.model.df
-        opts = {'replace':  {'type':'entry','default':'','label':'Replace'},
-                'with':  {'type':'entry','default':'','label':'With'},
+        opts = {'replace': {'type': 'entry', 'default': '', 'label': 'Replace'},
+                'with': {'type': 'entry', 'default': '', 'label': 'With'},
 
-               }
+                }
 
-        #'add symbol to start:', 'make lowercase','make uppercase'],
+        # 'add symbol to start:', 'make lowercase','make uppercase'],
 
         dlg = dialogs.MultipleInputDialog(self, opts, title='Format Column Names', width=300)
         dlg.exec_()
@@ -518,13 +523,13 @@ class DataFrameWidget(QWidget):
         kwds = dlg.values
         self.storeCurrent()
 
-        #pattern =
+        # pattern =
 
         df = self.model.df
         if start != '':
             df.columns = start + df.columns
         if pattern != '':
-            df.columns = [i.replace(pattern,repl) for i in df.columns]
+            df.columns = [i.replace(pattern, repl) for i in df.columns]
         if lower == 1:
             df.columns = df.columns.str.lower()
         elif upper == 1:
@@ -538,30 +543,30 @@ class DataFrameWidget(QWidget):
         ceates a new column."""
 
         df = self.table.model.df
-        tablecols = ['']+list(df.columns)
+        tablecols = [''] + list(df.columns)
         col = column
         idx = self.table.getSelectedColumns()
         cols = df.columns[idx]
         if len(cols) == 0:
             cols = [column]
 
-        singlefuncs = ['round','floor','ceil','trunc','power','log','exp','log10','log2',
-                 'negative','sign','diff',
-                 'sin','cos','tan','degrees','radians']
-        multifuncs = ['mean','std','max','min',
-                 'sum','subtract','divide','mod','remainder','convolve']
+        singlefuncs = ['round', 'floor', 'ceil', 'trunc', 'power', 'log', 'exp', 'log10', 'log2',
+                       'negative', 'sign', 'diff',
+                       'sin', 'cos', 'tan', 'degrees', 'radians']
+        multifuncs = ['mean', 'std', 'max', 'min',
+                      'sum', 'subtract', 'divide', 'mod', 'remainder', 'convolve']
 
-        if len(cols)>1:
-            funcs = multifuncs+singlefuncs
+        if len(cols) > 1:
+            funcs = multifuncs + singlefuncs
         else:
             funcs = singlefuncs
-        types = ['float','int']
-        opts = {'funcname':  {'type':'combobox','default':'int','items':funcs,'label':'Function'},
-                'newcol':  {'type':'entry','default':'','items':funcs,'label':'New column name'},
-                'inplace':  {'type':'checkbox','default':False,'label':'Update in place'},
-                'suffix':  {'type':'entry','default':'_x','items':funcs,'label':'Suffix'},
-                'group': {'type':'combobox','default':'','items':tablecols,'label':'Apply per Group'},
-               }
+        types = ['float', 'int']
+        opts = {'funcname': {'type': 'combobox', 'default': 'int', 'items': funcs, 'label': 'Function'},
+                'newcol': {'type': 'entry', 'default': '', 'items': funcs, 'label': 'New column name'},
+                'inplace': {'type': 'checkbox', 'default': False, 'label': 'Update in place'},
+                'suffix': {'type': 'entry', 'default': '_x', 'items': funcs, 'label': 'Suffix'},
+                'group': {'type': 'combobox', 'default': '', 'items': tablecols, 'label': 'Apply per Group'},
+                }
         dlg = dialogs.MultipleInputDialog(self, opts, title='Apply Function', width=300)
         dlg.exec_()
         if not dlg.accepted:
@@ -581,14 +586,14 @@ class DataFrameWidget(QWidget):
         self.table.storeCurrent()
 
         if newcol == '':
-            if len(cols)>3:
-                s = ' %s cols' %len(cols)
+            if len(cols) > 3:
+                s = ' %s cols' % len(cols)
             else:
-                s =  '(%s)' %(','.join(cols))[:20]
+                s = '(%s)' % (','.join(cols))[:20]
             newcol = funcname + s
 
-        if len(cols) == 2 and funcname in ['sum','subtract','divide','mod','remainder','convolve']:
-            newcol = cols[0]+' '+ funcname +' '+cols[1]
+        if len(cols) == 2 and funcname in ['sum', 'subtract', 'divide', 'mod', 'remainder', 'convolve']:
+            newcol = cols[0] + ' ' + funcname + ' ' + cols[1]
             result = df[cols[0]].combine(df[cols[1]], func=func)
         elif len(cols) > 2:
             result = df[cols].apply(func, 1)
@@ -604,7 +609,7 @@ class DataFrameWidget(QWidget):
             df[col] = result
         else:
             idx = df.columns.get_loc(col)
-            df.insert(idx+1, newcol, result)
+            df.insert(idx + 1, newcol, result)
         self.refresh()
         return
 
@@ -629,23 +634,23 @@ class DataFrameWidget(QWidget):
         col = column
         cols = [column]
         idx = self.table.getSelectedColumns()
-        if len(idx)>1:
+        if len(idx) > 1:
             cols = df.columns[idx]
 
-        ops = ['rolling window','expanding','shift']
-        winfuncs = ['sum','mean','std','max','min','sem','var','quantile']
-        wintypes = ['','boxcar','triang','blackman','hamming','bartlett',
-                    'parzen','bohman','blackmanharris','nuttall','barthann']
-        opts = {'operation': {'type':'combobox','default':'int','items':ops,'label':'Operation'},
-                'winfunc':  {'type':'combobox','default':'int','items':winfuncs,'label':'Function'},
-                'window': {'type':'spinbox','default':1, 'label':'Window','range':(1,1000)},
-                'periods': {'type':'spinbox','default':1, 'label':'Periods','range':(1,1000)},
-                'wintype': {'type':'combobox','default':'','items':wintypes,'label':'Window type'},
-                'center':  {'type':'checkbox','default':True,'label':'Center window'},
-                'newcol':  {'type':'entry','default':'','label':'New column name'},
-                'inplace':  {'type':'checkbox','default':False,'label':'Update in place'},
-                'suffix':  {'type':'entry','default':'_x','label':'Suffix'}
-               }
+        ops = ['rolling window', 'expanding', 'shift']
+        winfuncs = ['sum', 'mean', 'std', 'max', 'min', 'sem', 'var', 'quantile']
+        wintypes = ['', 'boxcar', 'triang', 'blackman', 'hamming', 'bartlett',
+                    'parzen', 'bohman', 'blackmanharris', 'nuttall', 'barthann']
+        opts = {'operation': {'type': 'combobox', 'default': 'int', 'items': ops, 'label': 'Operation'},
+                'winfunc': {'type': 'combobox', 'default': 'int', 'items': winfuncs, 'label': 'Function'},
+                'window': {'type': 'spinbox', 'default': 1, 'label': 'Window', 'range': (1, 1000)},
+                'periods': {'type': 'spinbox', 'default': 1, 'label': 'Periods', 'range': (1, 1000)},
+                'wintype': {'type': 'combobox', 'default': '', 'items': wintypes, 'label': 'Window type'},
+                'center': {'type': 'checkbox', 'default': True, 'label': 'Center window'},
+                'newcol': {'type': 'entry', 'default': '', 'label': 'New column name'},
+                'inplace': {'type': 'checkbox', 'default': False, 'label': 'Update in place'},
+                'suffix': {'type': 'entry', 'default': '_x', 'label': 'Suffix'}
+                }
 
         dlg = dialogs.MultipleInputDialog(self, opts, title='Transform/Resample', width=300)
         dlg.exec_()
@@ -665,7 +670,7 @@ class DataFrameWidget(QWidget):
         center = kwds['center']
 
         if wintype == '':
-            wintype=None
+            wintype = None
 
         for col in cols:
             if op == 'rolling window':
@@ -680,32 +685,32 @@ class DataFrameWidget(QWidget):
 
             if result is None:
                 return
-            if newcol == '' or len(cols)>1:
-                newcol = winfunc+'('+col+')'
+            if newcol == '' or len(cols) > 1:
+                newcol = winfunc + '(' + col + ')'
             if inplace == True:
                 df[col] = result
             else:
                 if newcol in df.columns:
                     df.drop(columns=newcol)
                 idx = df.columns.get_loc(col)
-                df.insert(idx+1, newcol, result)
+                df.insert(idx + 1, newcol, result)
         self.refresh()
         return
 
     def fillData(self, column):
         """Fill column with data"""
 
-        dists = ['normal','gamma','uniform','random int','logistic']
+        dists = ['normal', 'gamma', 'uniform', 'random int', 'logistic']
         df = self.table.model.df
-        opts = {'random':  {'type':'checkbox','default':0,'label':'Random Noise',
-                                        'tooltip':' '},
-                'dist':  {'type':'combobox','default':'int',
-                    'items':dists,'label':'Distribution', 'tooltip':' '},
-                'low':  {'type':'entry','default':0,'label':'Low','tooltip':'start value if filling with range'},
-                'high':  {'type':'entry','default':1,'label':'High','tooltip':'end value if filling with range'},
-                'mean':  {'type':'entry','default':1,'label':'Mean'},
-                'std':  {'type':'entry','default':1,'label':'St. Dev'},
-        }
+        opts = {'random': {'type': 'checkbox', 'default': 0, 'label': 'Random Noise',
+                           'tooltip': ' '},
+                'dist': {'type': 'combobox', 'default': 'int',
+                         'items': dists, 'label': 'Distribution', 'tooltip': ' '},
+                'low': {'type': 'entry', 'default': 0, 'label': 'Low', 'tooltip': 'start value if filling with range'},
+                'high': {'type': 'entry', 'default': 1, 'label': 'High', 'tooltip': 'end value if filling with range'},
+                'mean': {'type': 'entry', 'default': 1, 'label': 'Mean'},
+                'std': {'type': 'entry', 'default': 1, 'label': 'St. Dev'},
+                }
 
         dlg = dialogs.MultipleInputDialog(self, opts, title='Fill', width=300)
         dlg.exec_()
@@ -722,7 +727,8 @@ class DataFrameWidget(QWidget):
 
         if low != '' and high != '':
             try:
-                low=float(low); high=float(high)
+                low = float(low);
+                high = float(high)
             except:
                 logging.error("Exception occurred", exc_info=True)
                 return
@@ -738,8 +744,8 @@ class DataFrameWidget(QWidget):
             elif dist == 'logistic':
                 data = np.random.logistic(low, high, len(df))
         else:
-            step = (high-low)/len(df)
-            data = pd.Series(np.arange(low,high,step))
+            step = (high - low) / len(df)
+            data = pd.Series(np.arange(low, high, step))
 
         self.table.storeCurrent()
         self.table.model.df[column] = data
@@ -752,13 +758,13 @@ class DataFrameWidget(QWidget):
         """
 
         df = self.table.model.df
-        props = ['day','dayofweek','month','hour','minute','second','microsecond','year',
-                 'dayofyear','weekofyear','quarter','days_in_month','is_leap_year']
-        opts = {'format':  {'type':'combobox','default':'int','editable':True,
-                            'items':timeformats,'label':'Conversion format'},
-                'errors':{'type':'combobox','items':['ignore','coerce'],'default':'ignore','label':'Errors'},
-                'prop':  {'type':'list','default':'int',
-                        'items':props,'label':'Extract from datetime'} }
+        props = ['day', 'dayofweek', 'month', 'hour', 'minute', 'second', 'microsecond', 'year',
+                 'dayofyear', 'weekofyear', 'quarter', 'days_in_month', 'is_leap_year']
+        opts = {'format': {'type': 'combobox', 'default': 'int', 'editable': True,
+                           'items': timeformats, 'label': 'Conversion format'},
+                'errors': {'type': 'combobox', 'items': ['ignore', 'coerce'], 'default': 'ignore', 'label': 'Errors'},
+                'prop': {'type': 'list', 'default': 'int',
+                         'items': props, 'label': 'Extract from datetime'}}
 
         dlg = dialogs.MultipleInputDialog(self, opts, title='Convert/Extract Dates')
         dlg.exec_()
@@ -769,7 +775,7 @@ class DataFrameWidget(QWidget):
         format = kwds['format']
         props = kwds['prop']
         errors = kwds['errors']
-        infer=False
+        infer = False
         if format == 'infer':
             format = None
             infer = True
@@ -777,9 +783,9 @@ class DataFrameWidget(QWidget):
         self.table.storeCurrent()
         if temp.dtype != 'datetime64[ns]':
             temp = pd.to_datetime(temp, format=format, infer_datetime_format=infer,
-                                errors=errors)
+                                  errors=errors)
 
-        if props != '' and len(props)>0:
+        if props != '' and len(props) > 0:
             for prop in props:
                 new = getattr(temp.dt, prop)
                 try:
@@ -789,7 +795,7 @@ class DataFrameWidget(QWidget):
                 if prop in df.columns:
                     df.drop(columns=prop)
                 idx = df.columns.get_loc(column)
-                df.insert(idx+1, prop, new)
+                df.insert(idx + 1, prop, new)
         else:
             self.table.model.df[column] = temp
         self.refresh()
@@ -799,19 +805,19 @@ class DataFrameWidget(QWidget):
         """Apply string operation to column(s)"""
 
         df = self.table.model.df
-        #cols = self.getSelectedColumns()
+        # cols = self.getSelectedColumns()
         col = column
-        funcs = ['','split','strip','lstrip','lower','upper','title','swapcase','len',
-                 'slice','replace','concat']
-        opts = {'function':  {'type':'combobox','default':'',
-                            'items':funcs,'label':'Function'},
-                'sep':  {'type':'entry','default':',', 'label':'Split separator'},
-                'start':  {'type':'entry','default':0, 'label':'Slice start'},
-                'end':  {'type':'entry','default':1, 'label':'Slice end'},
-                'pat':  {'type':'entry','default':'', 'label':'Pattern'},
-                'repl': {'type':'entry','default':'', 'label':'Replace with'},
-                'inplace': {'type':'checkbox','default':False, 'label':'In place'},
-               }
+        funcs = ['', 'split', 'strip', 'lstrip', 'lower', 'upper', 'title', 'swapcase', 'len',
+                 'slice', 'replace', 'concat']
+        opts = {'function': {'type': 'combobox', 'default': '',
+                             'items': funcs, 'label': 'Function'},
+                'sep': {'type': 'entry', 'default': ',', 'label': 'Split separator'},
+                'start': {'type': 'entry', 'default': 0, 'label': 'Slice start'},
+                'end': {'type': 'entry', 'default': 1, 'label': 'Slice end'},
+                'pat': {'type': 'entry', 'default': '', 'label': 'Pattern'},
+                'repl': {'type': 'entry', 'default': '', 'label': 'Replace with'},
+                'inplace': {'type': 'checkbox', 'default': False, 'label': 'In place'},
+                }
         dlg = dialogs.MultipleInputDialog(self, opts, title='String Operation', width=300)
         dlg.exec_()
         if not dlg.accepted:
@@ -829,8 +835,8 @@ class DataFrameWidget(QWidget):
 
         if func == 'split':
             new = df[col].str.split(sep).apply(pd.Series)
-            new.columns = [col+'_'+str(i) for i in new.columns]
-            self.table.model.df = pd.concat([df,new],1)
+            new.columns = [col + '_' + str(i) for i in new.columns]
+            self.table.model.df = pd.concat([df, new], 1)
             self.refresh()
             return
         elif func == 'strip':
@@ -848,23 +854,23 @@ class DataFrameWidget(QWidget):
         elif func == 'len':
             x = df[col].str.len()
         elif func == 'slice':
-            x = df[col].str.slice(start,end)
+            x = df[col].str.slice(start, end)
         elif func == 'replace':
             x = df[col].replace(pat, repl, regex=True)
         elif func == 'concat':
             x = df[col].str.cat(df[cols[1]].astype(str), sep=sep)
         if inplace == 0:
-            newcol = col+'_'+func
+            newcol = col + '_' + func
         else:
             newcol = col
         if x is None:
-            print ('no function selected')
+            print('no function selected')
             return
         if inplace == 0:
             if newcol in df.columns:
                 df.drop(columns=newcol)
             idx = df.columns.get_loc(col)
-            df.insert(idx+1, newcol, x)
+            df.insert(idx + 1, newcol, x)
         self.refresh()
         return
 
@@ -873,20 +879,20 @@ class DataFrameWidget(QWidget):
 
         df = self.table.model.df
         if not isinstance(df.index, pd.DatetimeIndex):
-            msg = QMessageBox(None, "No datetime index",'Your date/time column should be the index.')
+            msg = QMessageBox(None, "No datetime index", 'Your date/time column should be the index.')
             msg.exec_()
             return
 
-        conv = ['start','end']
-        freqs = ['M','W','D','H','min','S','Q','A','AS','L','U']
-        funcs = ['mean','sum','count','max','min','std','first','last']
+        conv = ['start', 'end']
+        freqs = ['M', 'W', 'D', 'H', 'min', 'S', 'Q', 'A', 'AS', 'L', 'U']
+        funcs = ['mean', 'sum', 'count', 'max', 'min', 'std', 'first', 'last']
 
-        opts = {'freq':  {'type':'combobox','default':'M',
-                            'items':freqs,'label':'Frequency'},
-                'period':  {'type':'entry','default':1,
-                            'label':'Period'},
-                'func':  {'type':'combobox','default':'mean',
-                        'items':funcs,'label':'Function'} }
+        opts = {'freq': {'type': 'combobox', 'default': 'M',
+                         'items': freqs, 'label': 'Frequency'},
+                'period': {'type': 'entry', 'default': 1,
+                           'label': 'Period'},
+                'func': {'type': 'combobox', 'default': 'mean',
+                         'items': funcs, 'label': 'Function'}}
 
         dlg = dialogs.MultipleInputDialog(self, opts, title='Resample', width=300)
         dlg.exec_()
@@ -898,7 +904,7 @@ class DataFrameWidget(QWidget):
         period = kwds['period']
         func = kwds['func']
 
-        rule = str(period)+freq
+        rule = str(period) + freq
         new = df.resample(rule).apply(func)
         self.showSubTable(new, index=True)
         return
@@ -963,22 +969,23 @@ class DataFrameWidget(QWidget):
         class SubWidget(QDockWidget):
             def __init__(self, parent, table):
                 super(SubWidget, self).__init__(parent)
-                self.table=table
-                #self.setSizePolicy(QSizePolicy.Expanding , QSizePolicy.Expanding)
+                self.table = table
+                # self.setSizePolicy(QSizePolicy.Expanding , QSizePolicy.Expanding)
+
             def closeEvent(self, ce):
                 self.table.showAll()
 
         if self.filterdock == None:
             dock = self.filterdock = dock = SubWidget(self.splitter, self.table)
             dock.setFeatures(QDockWidget.DockWidgetClosable)
-            self.splitter.setSizes((500,200))
+            self.splitter.setSizes((500, 200))
             index = self.splitter.indexOf(dock)
             self.splitter.setCollapsible(index, False)
             self.filterdialog = dlg = dialogs.FilterDialog(dock, self.table)
             dock.setWidget(dlg)
         else:
             self.filterdock.show()
-            self.splitter.setSizes((500,200))
+            self.splitter.setSizes((500, 200))
             self.filterdialog.update()
         return
 
@@ -1009,7 +1016,7 @@ class DataFrameWidget(QWidget):
             index = self.splitter.indexOf(dock)
             self.splitter.setCollapsible(index, False)
             self.splitter.addWidget(dock)
-            self.splitter.setSizes((500,200))
+            self.splitter.setSizes((500, 200))
 
         self.subtabledock.show()
         newtable = SubTableWidget(self.subtabledock, dataframe=df, statusbar=False, font=FONT)
@@ -1018,15 +1025,15 @@ class DataFrameWidget(QWidget):
 
         if hasattr(self, 'pf'):
             newtable.pf = self.pf
-        #if index == True:
+        # if index == True:
         #    newtable.showIndex()
         return
 
     def closeSubtable(self):
 
         if hasattr(self, 'subtable'):
-            #w = self.splitter.widget(1)
-            #w.deleteLater()
+            # w = self.splitter.widget(1)
+            # w.deleteLater()
             self.subtable = None
         return
 
@@ -1058,22 +1065,24 @@ class DataFrameWidget(QWidget):
             from . import interpreter
             self.consoledock = dock = QDockWidget(self.splitter)
             dock.setFeatures(QDockWidget.DockWidgetClosable)
-            dock.resize(200,100)
+            dock.resize(200, 100)
             index = self.splitter.indexOf(dock)
             self.splitter.setCollapsible(index, False)
             self.pyconsole = interpreter.TerminalPython(dock, table=self.table, app=self.app)
             dock.setWidget(self.pyconsole)
-            self.splitter.setSizes((500,300))
+            self.splitter.setSizes((500, 300))
         else:
             self.consoledock.show()
         return
+
 
 class DataFrameTable(QTableView):
     """
     QTableView with pandas DataFrame as model.
     """
+
     def __init__(self, parent=None, dataframe=None, font='Arial',
-                    fontsize=12, columnwidth=80, timeformat='%m-%d-%Y', **kwargs):
+                 fontsize=12, columnwidth=80, timeformat='%m-%d-%Y', **kwargs):
 
         QTableView.__init__(self)
         self.parent = parent
@@ -1082,23 +1091,23 @@ class DataFrameTable(QTableView):
         self.columnwidth = columnwidth
         self.timeformat = timeformat
         self.clicked.connect(self.showSelection)
-        #self.doubleClicked.connect(self.handleDoubleClick)
-        #self.setSelectionBehavior(QTableView.SelectRows)
-        #self.setSelectionBehavior(QTableView.SelectColumns)
-        #vh = self.vheader = RowHeader()
-        #self.setVerticalHeader(vh)
+        # self.doubleClicked.connect(self.handleDoubleClick)
+        # self.setSelectionBehavior(QTableView.SelectRows)
+        # self.setSelectionBehavior(QTableView.SelectColumns)
+        # vh = self.vheader = RowHeader()
+        # self.setVerticalHeader(vh)
         vh = self.verticalHeader()
         vh.setVisible(True)
         vh.setDefaultSectionSize(30)
         vh.setMinimumWidth(50)
         vh.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         vh.customContextMenuRequested.connect(self.rowHeaderMenu)
-        #vh.sectionClicked.connect(self.rowClicked)
+        # vh.sectionClicked.connect(self.rowClicked)
 
         hh = self.horizontalHeader()
         hh.setVisible(True)
-        #hh.setStretchLastSection(True)
-        #hh.setSectionResizeMode(QHeaderView.Interactive)
+        # hh.setStretchLastSection(True)
+        # hh.setSectionResizeMode(QHeaderView.Interactive)
         hh.setDefaultSectionSize(columnwidth)
         hh.setSelectionBehavior(QTableView.SelectColumns)
         hh.setSectionsMovable(True)
@@ -1107,7 +1116,7 @@ class DataFrameTable(QTableView):
         hh.customContextMenuRequested.connect(self.columnHeaderMenu)
         hh.sectionClicked.connect(self.columnSelected)
 
-        #formats
+        # formats
         self.setDragEnabled(True)
         self.viewport().setAcceptDrops(True)
 
@@ -1116,16 +1125,16 @@ class DataFrameTable(QTableView):
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
         self.setCornerButtonEnabled(True)
-        #self.setSortingEnabled(True)
+        # self.setSortingEnabled(True)
         self.updateFont()
 
         tm = DataFrameModel(dataframe)
         self.setModel(tm)
         self.model = tm
         self.filtered = False
-        #self.resizeColumnsToContents()
+        # self.resizeColumnsToContents()
         self.setWordWrap(False)
-        #temp file for undo
+        # temp file for undo
         file, self.undo_file = tempfile.mkstemp(suffix='.pkl')
         try:
             os.remove(self.undo_file)
@@ -1145,15 +1154,15 @@ class DataFrameTable(QTableView):
         """Refresh table if dataframe is changed"""
 
         self.updateFont()
-        #self.horizontalHeader().setDefaultSectionSize(COLUMNWIDTH)
+        # self.horizontalHeader().setDefaultSectionSize(COLUMNWIDTH)
         self.model.beginResetModel()
         index = self.model.index
         try:
-            self.model.dataChanged.emit(0,0)
+            self.model.dataChanged.emit(0, 0)
         except:
-            self.model.dataChanged.emit(index(0,0),index(0,0))
+            self.model.dataChanged.emit(index(0, 0), index(0, 0))
         self.model.endResetModel()
-        if hasattr(self.parent,'statusbar'):
+        if hasattr(self.parent, 'statusbar'):
             self.parent.updateStatusBar()
         return
 
@@ -1169,16 +1178,16 @@ class DataFrameTable(QTableView):
     def storeCurrent(self):
         """Store current version of the table before a major change is made"""
 
-        self.prevdf = self.model.df#.copy()
+        self.prevdf = self.model.df  # .copy()
         self.prevdf.to_pickle(self.undo_file)
-        #self.parent.updatesignal.speak.emit()
+        # self.parent.updatesignal.speak.emit()
         return
 
     def undo(self):
         """Undo last change to table"""
 
         if os.path.exists(self.undo_file):
-            print ('undo-ing')
+            print('undo-ing')
             self.model.df = pd.read_pickle(self.undo_file)
             self.refresh()
             os.remove(self.undo_file)
@@ -1188,19 +1197,19 @@ class DataFrameTable(QTableView):
         """Get memory info as string"""
 
         m = self.model.df.memory_usage(deep=True).sum()
-        if m>1e5:
-            m = round(m/1048576,2)
-            units='MB'
+        if m > 1e5:
+            m = round(m / 1048576, 2)
+            units = 'MB'
         else:
-            units='Bytes'
-        s = "%s %s" %(m,units)
+            units = 'Bytes'
+        s = "%s %s" % (m, units)
         return s
 
     def memory_usage(self):
 
         info = self.getMemory()
         msg = QMessageBox()
-        msg.setText('Memory: '+info)
+        msg.setText('Memory: ' + info)
         msg.setWindowTitle('Memory Usage')
         msg.exec_()
         return
@@ -1210,7 +1219,7 @@ class DataFrameTable(QTableView):
         cellContent = item.data()
         row = item.row()
         model = item.model()
-        columnsTotal= model.columnCount(None)
+        columnsTotal = model.columnCount(None)
         return
 
     def getColumnOrder(self):
@@ -1218,7 +1227,7 @@ class DataFrameTable(QTableView):
 
         hh = self.horizontalHeader()
         df = self.model.df
-        logidx = [hh.logicalIndex(i) for i in range(0,self.model.columnCount())]
+        logidx = [hh.logicalIndex(i) for i in range(0, self.model.columnCount())]
         cols = [df.columns[i] for i in logidx]
         return cols
 
@@ -1244,10 +1253,10 @@ class DataFrameTable(QTableView):
         sm = self.selectionModel()
         rows = [(i.row()) for i in sm.selectedIndexes()]
         cols = [(i.column()) for i in sm.selectedIndexes()]
-        #get unique rows/cols keeping order
+        # get unique rows/cols keeping order
         rows = list(dict.fromkeys(rows).keys())
         cols = list(dict.fromkeys(cols).keys())
-        return df.iloc[rows,cols]
+        return df.iloc[rows, cols]
 
     def handleDoubleClick(self, item):
 
@@ -1270,7 +1279,7 @@ class DataFrameTable(QTableView):
 
         df = self.model.df
         sel = self.getSelectedColumns()
-        if len(sel)>1:
+        if len(sel) > 1:
             for i in sel:
                 self.model.sort(i, order=QtCore.Qt.DescendingOrder)
         else:
@@ -1282,12 +1291,12 @@ class DataFrameTable(QTableView):
 
         if answer == None:
             answer = QMessageBox.question(self, 'Delete Cells?',
-                             'Are you sure?', QMessageBox.Yes, QMessageBox.No)
+                                          'Are you sure?', QMessageBox.Yes, QMessageBox.No)
         if not answer:
             return
         self.storeCurrent()
-        #print (rows, cols)
-        self.model.df.iloc[rows,cols] = np.nan
+        # print (rows, cols)
+        self.model.df.iloc[rows, cols] = np.nan
         return
 
     def setRowColor(self, rowIndex, color):
@@ -1316,7 +1325,7 @@ class DataFrameTable(QTableView):
         hheader = self.horizontalHeader()
         idx = hheader.logicalIndexAt(pos)
         column = self.model.df.columns[idx]
-        #model = self.model
+        # model = self.model
         menu = QMenu(self)
 
         sortAction = menu.addAction("Sort ")
@@ -1324,7 +1333,7 @@ class DataFrameTable(QTableView):
         sortAction.setIcon(iconw)
         setIndexAction = menu.addAction("Set as Index")
 
-        colmenu = QMenu("Column",menu)
+        colmenu = QMenu("Column", menu)
         deleteColumnAction = colmenu.addAction("Delete Column")
         renameColumnAction = colmenu.addAction("Rename Column")
         addColumnAction = colmenu.addAction("Add Column")
@@ -1335,7 +1344,7 @@ class DataFrameTable(QTableView):
         stringOpAction = menu.addAction("String Operation")
         datetimeAction = menu.addAction("Date/Time Conversion")
 
-        #sortAction = menu.addAction("Sort By")
+        # sortAction = menu.addAction("Sort By")
         action = menu.exec_(self.mapToGlobal(pos))
         if action == sortAction:
             self.sort(idx)
@@ -1387,14 +1396,14 @@ class DataFrameTable(QTableView):
         importAction = menu.addAction("Import File")
         exportAction = menu.addAction("Export Table")
         plotAction = menu.addAction("Plot Selected")
-        rowsmenu = QMenu("Rows",menu)
+        rowsmenu = QMenu("Rows", menu)
         menu.addAction(rowsmenu.menuAction())
         deleteRowsAction = rowsmenu.addAction("Delete Rows")
         addRowsAction = rowsmenu.addAction("Add Rows")
-        modemenu = QMenu("Mode",menu)
+        modemenu = QMenu("Mode", menu)
         menu.addAction(modemenu.menuAction())
         modegroup = QActionGroup(self)
-        for i,mode in enumerate(MODES):
+        for i, mode in enumerate(MODES):
             action = QAction(mode, self)
             action = modemenu.addAction(mode)
             action.setCheckable(True)
@@ -1445,7 +1454,7 @@ class DataFrameTable(QTableView):
 
         df = self.model.df
         name, ok = QInputDialog().getText(self, "Enter Column Name",
-                                             "Name:", QLineEdit.Normal)
+                                          "Name:", QLineEdit.Normal)
         if ok and name:
             if name in df.columns:
                 return
@@ -1456,12 +1465,12 @@ class DataFrameTable(QTableView):
     def deleteColumn(self, column=None):
 
         idx = self.getSelectedColumns()
-        if len(idx)>0:
+        if len(idx) > 0:
             cols = self.model.df.columns[idx]
         else:
             cols = [column]
         reply = QMessageBox.question(self, 'Delete Column(s)?',
-                             'Are you sure?', QMessageBox.Yes, QMessageBox.No)
+                                     'Are you sure?', QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.No:
             return False
         self.storeCurrent()
@@ -1473,15 +1482,15 @@ class DataFrameTable(QTableView):
         """Add n rows"""
 
         num, ok = QInputDialog().getInt(self, "Rows to add",
-                                             "Rows:", QLineEdit.Normal)
+                                        "Rows:", QLineEdit.Normal)
         if not ok:
             return
         df = self.model.df
         try:
-            ind = self.df.index.max()+1
+            ind = self.df.index.max() + 1
         except:
-            ind = len(df)+1
-        new = pd.DataFrame(np.nan, index=range(ind,ind+num), columns=df.columns)
+            ind = len(df) + 1
+        new = pd.DataFrame(np.nan, index=range(ind, ind + num), columns=df.columns)
         self.model.df = pd.concat([df, new])
         self.refresh()
         return
@@ -1491,7 +1500,7 @@ class DataFrameTable(QTableView):
 
         rows = self.getSelectedRows()
         reply = QMessageBox.question(self, 'Delete Rows?',
-                             'Are you sure?', QMessageBox.Yes, QMessageBox.No)
+                                     'Are you sure?', QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.No:
             return False
         idx = self.model.df.index[rows]
@@ -1502,9 +1511,9 @@ class DataFrameTable(QTableView):
     def renameColumn(self, column=None):
 
         name, ok = QInputDialog().getText(self, "Enter New Column Name",
-                                             "Name:", QLineEdit.Normal)
+                                          "Name:", QLineEdit.Normal)
         if ok and name:
-            self.model.df.rename(columns={column:name},inplace=True)
+            self.model.df.rename(columns={column: name}, inplace=True)
             self.refresh()
         return
 
@@ -1515,7 +1524,7 @@ class DataFrameTable(QTableView):
         self.updateFont()
         vh = self.verticalHeader()
         h = vh.defaultSectionSize()
-        vh.setDefaultSectionSize(h+2)
+        vh.setDefaultSectionSize(h + 2)
         return
 
     def zoomOut(self, fontsize=None):
@@ -1525,7 +1534,7 @@ class DataFrameTable(QTableView):
         self.updateFont()
         vh = self.verticalHeader()
         h = vh.defaultSectionSize()
-        vh.setDefaultSectionSize(h-2)
+        vh.setDefaultSectionSize(h - 2)
         return
 
     def changeColumnWidths(self, factor=1.1):
@@ -1533,19 +1542,20 @@ class DataFrameTable(QTableView):
 
         for col in range(len(self.model.df.columns)):
             wi = self.columnWidth(col)
-            self.setColumnWidth(col,wi*factor)
+            self.setColumnWidth(col, wi * factor)
 
     def setColumnWidths(self, widths):
 
         for col in range(len(self.model.df.columns)):
-            self.setColumnWidth(col,widths[col])
+            self.setColumnWidth(col, widths[col])
 
     def getColumnWidths(self):
 
-        widths=[]
+        widths = []
         for col in range(len(self.model.df.columns)):
             widths.append(self.columnWidth(col))
         return widths
+
 
 class DataFrameModel(QtCore.QAbstractTableModel):
     def __init__(self, dataframe=None, *args):
@@ -1558,7 +1568,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         return
 
     def update(self, df):
-        #print('Updating Model')
+        # print('Updating Model')
         self.df = df
 
     def rowCount(self, parent=QtCore.QModelIndex()):
@@ -1574,8 +1584,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         i = index.row()
         j = index.column()
-        #print (self.df.dtypes)
-        #coltype = self.df.dtypes[j]
+        # print (self.df.dtypes)
+        # coltype = self.df.dtypes[j]
         coltype = self.df[self.df.columns[j]].dtype
         isdate = is_datetime(coltype)
         if role == QtCore.Qt.DisplayRole:
@@ -1583,7 +1593,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             if isdate:
                 return value.strftime(TIMEFORMAT)
             elif type(value) != str:
-                if type(value) in [float,np.float64] and np.isnan(value):
+                if type(value) in [float, np.float64] and np.isnan(value):
                     return ''
                 elif type(value) == np.float:
                     return value
@@ -1593,7 +1603,7 @@ class DataFrameModel(QtCore.QAbstractTableModel):
                 return '{0}'.format(value)
         elif (role == QtCore.Qt.EditRole):
             value = self.df.iloc[i, j]
-            #print (coltype)
+            # print (coltype)
             try:
                 return float(value)
             except:
@@ -1617,9 +1627,9 @@ class DataFrameModel(QtCore.QAbstractTableModel):
 
         i = index.row()
         j = index.column()
-        curr = self.df.iloc[i,j]
-        #print (curr, value)
-        self.df.iloc[i,j] = value
+        curr = self.df.iloc[i, j]
+        # print (curr, value)
+        self.df.iloc[i, j] = value
         return True
 
     '''def dragMoveEvent(self, event):
@@ -1643,10 +1653,11 @@ class DataFrameModel(QtCore.QAbstractTableModel):
         self.layoutChanged.emit()
         return
 
+
 class SubTableWidget(DataFrameWidget):
     """Widget for sub table"""
-    def __init__(self, parent=None, dataframe=None, **args):
 
+    def __init__(self, parent=None, dataframe=None, **args):
         DataFrameWidget.__init__(self, parent, dataframe, **args)
         return
 
@@ -1654,13 +1665,13 @@ class SubTableWidget(DataFrameWidget):
         """Override default toolbar"""
 
         self.setLayout(self.layout)
-        items = {'copy': {'action':self.copy,'file':'copy'},
-                 'paste': {'action':self.paste,'file':'paste'},
-                 'plot': {'action':self.plot,'file':'plot'},
-                 'transpose': {'action':self.transpose,'file':'transpose'}
+        items = {'copy': {'action': self.copy, 'file': 'copy'},
+                 'paste': {'action': self.paste, 'file': 'paste'},
+                 'plot': {'action': self.plot, 'file': 'plot'},
+                 'transpose': {'action': self.transpose, 'file': 'transpose'}
                  }
         toolbar = QToolBar("Toolbar")
         toolbar.setOrientation(QtCore.Qt.Vertical)
         dialogs.addToolBarItems(toolbar, self, items)
-        self.layout.addWidget(toolbar,1,2)
+        self.layout.addWidget(toolbar, 1, 2)
         return

@@ -39,7 +39,7 @@ class TestApp(QMainWindow):
         self.main = QWidget()
         self.setCentralWidget(self.main)
         layout = QVBoxLayout(self.main)
-        df = data.getSampleData()
+        df = data.get_sample_data()
         t = core.DataFrameWidget(self.main,dataframe=df)
         layout.addWidget(t)
         t.showInterpreter()
