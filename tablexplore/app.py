@@ -227,6 +227,7 @@ class Application(QMainWindow):
         self.file_menu.addAction('&Save As', self.save_as_project)
         self.file_menu.addAction(self.import_files_menu.menuAction())
         self.import_files_menu.addAction('&CSV...', self.import_csv_file)
+        self.import_files_menu.addAction('&Excel...', self.import_excel_file)
         self.import_files_menu.addAction('&HDF5...', self.importHDF)
         self.import_files_menu.addAction('&URL...', self.importURL)
         self.file_menu.addAction('&Export As', self.export_as)
@@ -621,6 +622,13 @@ class Application(QMainWindow):
         self.add_sheet()
         w = self.get_current_table()
         w.import_csv(filename)
+        return
+
+    def import_excel_file(self):
+
+        self.add_sheet()
+        w = self.get_current_table()
+        w.import_excel()
         return
 
     def importHDF(self):
