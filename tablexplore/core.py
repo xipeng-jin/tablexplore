@@ -188,27 +188,6 @@ class DataFrameWidget(QWidget):
     def save(self):
         return
 
-    def import_csv(self, filename=None, dialog=True, **kwargs):
-        """Import csv file"""
-
-        if dialog is True and filename is None:
-            options = QFileDialog.Options()
-            filename, _ = QFileDialog.getOpenFileName(self, "Import File",
-                                                      "", "CSV files (*.csv);;Text Files (*.txt);;All Files (*)",
-                                                      options=options)
-            if not filename:
-                return
-            dlg = dialogs.ImportDialog(self, filename)
-            dlg.exec_()
-            if not dlg.accepted:
-                return
-            self.table.model.df = dlg.df
-            self.refresh()
-        elif filename is not None:
-            self.table.model.df = pd.read_csv(filename)
-            self.refresh()
-        return
-
     def import_excel(self):
         """Import excel file"""
 

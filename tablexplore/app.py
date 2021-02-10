@@ -117,7 +117,7 @@ class Application(QMainWindow):
             self.open_project(project_file)
         elif csv_file is not None:
             self.new_project()
-            self.import_csv_file(csv_file)
+            self.import_csv_txt(csv_file)
         else:
             self.new_project()
         self.threadpool = QtCore.QThreadPool()
@@ -226,7 +226,7 @@ class Application(QMainWindow):
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_S)
         self.file_menu.addAction('&Save As', self.save_as_project)
         self.file_menu.addAction(self.import_files_menu.menuAction())
-        self.import_files_menu.addAction('&CSV...', self.import_csv_file)
+        self.import_files_menu.addAction('&CSV...', self.import_csv_txt)
         self.import_files_menu.addAction('&Excel...', self.import_excel_file)
         self.import_files_menu.addAction('&HDF5...', self.importHDF)
         self.import_files_menu.addAction('&URL...', self.importURL)
@@ -617,11 +617,29 @@ class Application(QMainWindow):
         # table.drawMultipleCols()
         return
 
-    def import_csv_file(self, filename=None):
+    def import_csv_txt(self, filepath=None, dialog=True):
 
-        self.add_sheet()
-        w = self.get_current_table()
-        w.import_csv(filename)
+        if dialog is True and filepath is None:
+            options = QFileDialog.Options()
+            filepath, _ = QFileDialog.getOpenFileName(
+                self, "Import File",
+                "", "CSV files (*.csv);;Text Files (*.txt);;All Files (*)",
+                options=options
+            )
+            if filepath:
+                dlg = dialogs.ImportDialog(self, filepath)
+                dlg.exec_()
+                if dlg.accepted:
+                    filename = os.path.basename(filepath)
+                    filename = os.path.splitext(filename)[0]
+                    self.add_sheet(name=filename, df=dlg.df)
+                else:
+                    return
+            else:
+                return
+        elif filepath is not None:
+            df = pd.read_csv(filepath)
+            self.add_sheet(df=df)
         return
 
     def import_excel_file(self):
