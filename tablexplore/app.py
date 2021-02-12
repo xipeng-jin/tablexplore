@@ -227,7 +227,7 @@ class Application(QMainWindow):
         self.file_menu.addAction('&Save As', self.save_as_project)
         self.file_menu.addAction(self.import_files_menu.menuAction())
         self.import_files_menu.addAction('&CSV...', self.import_csv_txt)
-        self.import_files_menu.addAction('&Excel...', self.import_excel_file)
+        self.import_files_menu.addAction('&Excel...', self.import_excel)
         self.import_files_menu.addAction('&HDF5...', self.importHDF)
         self.import_files_menu.addAction('&URL...', self.importURL)
         self.file_menu.addAction('&Export As', self.export_as)
@@ -642,11 +642,44 @@ class Application(QMainWindow):
             self.add_sheet(df=df)
         return
 
-    def import_excel_file(self):
+    def import_excel(self, filepath=None):
+        """Import Excel file"""
 
-        self.add_sheet()
-        w = self.get_current_table()
-        w.import_excel()
+        def convert_column_letters(n):
+            string = ""
+            while n > 0:
+                n, remainder = divmod(n-1, 26)
+                string = chr(65 + remainder) + string
+            return string
+
+        def read_excel_sheets(path):
+            df_dict = pd.read_excel(path, sheet_name=None, header=None)
+            sheet_names = list(df_dict.keys())
+            sheet_dfs = list(df_dict.values())
+            return sheet_names, sheet_dfs
+
+        if filepath is None:
+            options = QFileDialog.Options()
+            filepath, _ = QFileDialog.getOpenFileName(
+                self, "Import Excel",
+                "", "xlsx files (*.xlsx);;xls Files (*.xls);;All Files (*)",
+                options=options
+            )
+            if filepath:
+                names, dfs = read_excel_sheets(filepath)
+                for name, df in zip(names, dfs):
+                    column_letters = []
+                    for idx in list(df.columns):
+                        letter = convert_column_letters(idx+1)
+                        column_letters.append(letter)
+                    df.columns = column_letters
+                    self.add_sheet(name, df)
+            else:
+                return
+        elif filepath is not None:
+            names, dfs = read_excel_sheets(filepath)
+            for name, df in zip(names, dfs):
+                self.add_sheet(name, df)
         return
 
     def importHDF(self):

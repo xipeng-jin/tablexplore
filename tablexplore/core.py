@@ -188,18 +188,6 @@ class DataFrameWidget(QWidget):
     def save(self):
         return
 
-    def import_excel(self):
-        """Import excel file"""
-
-        options = QFileDialog.Options()
-        filename, _ = QFileDialog.getOpenFileName(self, "Import Excel",
-                                                  "", "xlsx files (*.xlsx);;xls Files (*.xls);;All Files (*)",
-                                                  options=options)
-        if filename:
-            self.table.model.df = pd.read_excel(filename)
-            self.refresh()
-        return
-
     def importHDF(self):
         """Import hdf5 file"""
 
