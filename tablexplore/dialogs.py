@@ -323,6 +323,7 @@ class ImportDialog(QDialog):
         self.parent = parent
         self.filename = filename
         self.df = None
+        self.cancel = False  # Indicate whether cancel the dialog
         self.setGeometry(QtCore.QRect(250, 250, 900, 600))
         self.setGeometry(
             QStyle.alignedRect(
@@ -510,6 +511,7 @@ class ImportDialog(QDialog):
         return
 
     def quit(self):
+        self.cancel = True
         self.close()
         return
 

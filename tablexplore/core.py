@@ -131,7 +131,6 @@ class DataFrameWidget(QWidget):
 
         self.setLayout(self.layout)
         items = {'load': {'action': self.load, 'file': 'open'},
-                 'importexcel': {'action': self.import_excel, 'file': 'excel'},
                  'copy': {'action': self.copy, 'file': 'copy', 'shortcut': 'Ctrl+C'},
                  'paste': {'action': self.paste, 'file': 'paste', 'shortcut': 'Ctrl+V'},
                  'insert': {'action': self.insert, 'file': 'table-insert'},

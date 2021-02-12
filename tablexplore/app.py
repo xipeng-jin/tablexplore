@@ -629,7 +629,7 @@ class Application(QMainWindow):
             if filepath:
                 dlg = dialogs.ImportDialog(self, filepath)
                 dlg.exec_()
-                if dlg.accepted:
+                if dlg.accepted and not dlg.cancel:
                     filename = os.path.basename(filepath)
                     filename = os.path.splitext(filename)[0]
                     self.add_sheet(name=filename, df=dlg.df)
