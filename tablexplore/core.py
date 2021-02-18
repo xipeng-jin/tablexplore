@@ -89,6 +89,7 @@ class DataFrameWidget(QWidget):
         l = self.layout = QGridLayout()
         l.setSpacing(2)
         l.addWidget(self.splitter, 1, 1)
+        self.dataframe = dataframe
         self.table = DataFrameTable(self, dataframe, **kwargs)
         self.splitter.addWidget(self.table)
         self.splitter.setSizes((500, 200))

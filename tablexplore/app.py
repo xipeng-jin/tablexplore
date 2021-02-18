@@ -75,6 +75,7 @@ class Application(QMainWindow):
         self.recent_files_menu = QMenu(title="Recent Projects", parent=self.file_menu)
         self.import_files_menu = QMenu(title="Import Files", parent=self.file_menu)
         self.edit_menu = QMenu(title='&Edit', parent=self)
+        self.search_menu = QMenu(title='Search', parent=self.edit_menu)
         self.view_menu = QMenu(title='&View', parent=self)
         self.style_menu = QMenu(title="Styles", parent=self.view_menu)
         self.sheet_menu = QMenu(title='&Sheet', parent=self)
@@ -240,6 +241,9 @@ class Application(QMainWindow):
         self.menuBar().addMenu(self.edit_menu)
         self.undo_item = self.edit_menu.addAction('&Undo', self.undo,
                                                   QtCore.Qt.CTRL + QtCore.Qt.Key_Z)
+        self.edit_menu.addAction(self.search_menu.menuAction())
+        self.search_menu.addAction('&Local Search...', self.local_search)
+        self.search_menu.addAction('&Global Search...', self.global_search)
         # self.undo_item.setDisabled(True)
         # self.edit_menu.addAction('&Run Last Action', self.runLastAction)
         icon = QIcon(os.path.join(iconpath, 'preferences-system.png'))
@@ -905,6 +909,21 @@ class Application(QMainWindow):
         w = self.get_current_table()
         w.table.undo()
         w.refresh()
+        return
+
+    def local_search(self):
+        """Search keywords in current sheet"""
+
+        w = self.get_current_table()
+        dlg = dialogs.SearchDialog(self, sheets=w)
+        dlg.exec_()
+        return
+
+    def global_search(self):
+        """Search keywords in all sheets in project"""
+
+        dlg = dialogs.SearchDialog(self, sheets=self.sheets)
+        dlg.exec_()
         return
 
     '''def runLastAction(self):

@@ -287,6 +287,62 @@ class TextDialog(QDialog):
         return
 
 
+class SearchDialog(QDialog):
+    """Search dialog"""
+
+    def __init__(self, parent, sheets):
+        super(SearchDialog, self).__init__(parent)
+        self.sheets = sheets
+        self.resize(1000, 500)
+        self.setWindowTitle("Search")
+        layout = QVBoxLayout(self)
+
+        # Create text editor widget
+        tw = QWidget(parent)
+        tw_hbox = QHBoxLayout(tw)
+        self.searchbox = PlainTextEditor(self)
+        tw_hbox.addWidget(self.searchbox, stretch=1)
+        self.resultbox = PlainTextEditor(self)
+        tw_hbox.addWidget(self.resultbox, stretch=3)
+        layout.addWidget(tw)
+
+        # Create button widget
+        bw = QWidget(parent)
+        bw_hbox = QHBoxLayout(bw)
+        button = QPushButton("Search")
+        button.clicked.connect(self.search)
+        bw_hbox.addWidget(button)
+        button = QPushButton("Close")
+        button.clicked.connect(self.close)
+        bw_hbox.addWidget(button)
+        layout.addWidget(bw)
+
+        self.show()
+        return
+
+    def search(self):
+        searchbox_val = self.searchbox.toPlainText()
+        keywords = searchbox_val.splitlines()
+        if type(self.sheets) is not OrderedDict:
+            df = self.sheets.dataframe
+            result = df[df.stack().str.contains("|".join(keywords)).any(level=0)]
+            self.resultbox.setPlainText(result.to_string())
+        else:
+            self.resultbox.clear()
+            names = list(self.sheets.keys())
+            for name in names:
+                df = self.sheets[name].dataframe
+                if df is not None:
+                    result = df[df.stack().str.contains("|".join(keywords)).any(level=0)]
+                    self.resultbox.insertPlainText(f"# {name}:\n")
+                    if result.empty:
+                        self.resultbox.insertPlainText("Not found!")
+                    else:
+                        self.resultbox.insertPlainText(result.to_string())
+                    self.resultbox.insertPlainText("\n\n")
+        return
+
+
 class MultipleInputDialog(QDialog):
     """Qdialog with multiple inputs"""
 
