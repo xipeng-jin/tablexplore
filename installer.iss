@@ -8,18 +8,18 @@ AppId={{82B97831-C1C9-4954-83EF-6DFA21D9E5F1}
 AppName=Tablexplore
 AppVersion=0.2.0
 ;AppVerName=Tablexplore 0.2.0
-AppPublisher=Damien Farrell
+AppPublisher=Xipeng Jin, Damien Farrell
 AppPublisherURL=https://dmnfarrell.github.io/tablexplore/
 AppSupportURL=https://dmnfarrell.github.io/tablexplore/
 AppUpdatesURL=https://dmnfarrell.github.io/tablexplore/
 DefaultDirName={autopf}\Tablexplore
 ChangesAssociations=yes
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\damien\projects\tablexplore\LICENSE
-InfoBeforeFile=C:\Users\damien\projects\tablexplore\description.txt
+LicenseFile=C:\Users\jin_x\PycharmProjects\tablexplore\LICENSE
+InfoBeforeFile=C:\Users\jin_x\PycharmProjects\tablexplore\description.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=mysetup
+OutputBaseFilename=Tablexplore_setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -31,8 +31,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\damien\projects\tablexplore\dist\tablexplore\tablexplore.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\damien\projects\tablexplore\dist\tablexplore\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Users\jin_x\PycharmProjects\tablexplore\dist\tablexplore\tablexplore.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\jin_x\PycharmProjects\tablexplore\dist\tablexplore\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

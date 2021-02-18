@@ -35,9 +35,9 @@ plugin_icon_path = os.path.join(module_path, 'plugins', 'icons')
 textalignment = None
 MODES = ['default', 'spreadsheet', 'locked']
 FONT = 'monospace'
-FONTSIZE = 12
+FONTSIZE = 10
 FONTSTYLE = ''
-COLUMNWIDTH = 80
+COLUMNWIDTH = 70
 TIMEFORMAT = '%m/%d/%Y'
 
 try:

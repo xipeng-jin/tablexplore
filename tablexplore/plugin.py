@@ -100,6 +100,7 @@ def load_plugins(plugins):
 def init_plugin_system(folders):
     """Find available plugins"""
 
+    failed = None
     for folder in folders:
         if not os.path.exists(folder):
             continue

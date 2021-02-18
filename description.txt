@@ -1,17 +1,52 @@
 Introduction
 ------------
 
-The tablexplore package provides a desktop application for
-plotting and tabular data analysis. It is implemented in PySide2 for Qt
-with the pandas DataFrame class as the table model backend. You can re-use the
-`DataFrameWidget` in your own PySide2 applications.
+This application is intended for educational/scientific use and allows quick
+visualization of data with convenient plotting. The primary goal is to let users
+explore their tables interactively without any prior programming knowledge and
+make interesting plots as they do this.
+
+One advantage is the ability to load and work with relatively large tables
+as compared to spreadsheets. The focus is on data manipulation rather than
+data entry. Though basic cell editing and row/column changes are supported.
+The program is free and open source. It is based on a Qt (PySide2) widget called
+pandasqtable which itself is a graphical frontend to the pandas DataFrame class.
 
 Installation
 ------------
 
-::
-  pip install -e git+https://github.com/dmnfarrell/tablexplore.git#egg=tablexplore
+For all operating systems with Python and pip installed:
 
+    pip install -e git+https://github.com/dmnfarrell/tablexplore.git#egg=tablexplore
+
+Linux
+
+The pip method above should work fine for most distributions but if you prefer
+you can also try the AppImage (experimental).
+Download from the latest release page and run as follows:
+
+    chmod +x tablexplore-0.3.0-x86_64.AppImage
+    ./tablexplore-0.3.0-x86_64.AppImage
+
+There is also a snap available, which can be installed using:
+
+    snap install tablexplore
+
+Windows
+
+A Windows standalone binary can be downloaded
+
+Feature
+-------
+* save and load projects
+* import csv/hdf/from urls
+* delete/add columns
+* groupby-aggregate/pivot/transpose/melt operations
+* merge tables
+* show sub-tables
+* plotting mostly works
+* apply column functions, resample, transform, string methods and date/time conversion
+* python interpreter
 
 Links
 -----

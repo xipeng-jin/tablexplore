@@ -69,7 +69,7 @@ class Application(QMainWindow):
 
         QMainWindow.__init__(self, parent=None)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.setWindowTitle("DataExplore")
+        self.setWindowTitle("Tablexplore")
         self.setWindowIcon(QIcon(os.path.join(module_path, 'logo.png')))
         # Initialize menu bar
         self.file_menu = QMenu(title='File', parent=self)
@@ -91,7 +91,7 @@ class Application(QMainWindow):
         self.main.setTabsClosable(True)
         self.main.tabCloseRequested.connect(lambda index: self.remove_sheet(index))
         screen_resolution = QGuiApplication.primaryScreen().availableGeometry()
-        width, height = screen_resolution.width() * 0.7, screen_resolution.height() * 0.7
+        width, height = screen_resolution.width() * 0.75, screen_resolution.height() * 0.7
         self.setGeometry(QtCore.QRect(200, 200, width, height))
         self.setMinimumSize(800, 600)
 
@@ -1052,7 +1052,7 @@ class Application(QMainWindow):
         """Open the online documentation"""
 
         import webbrowser
-        link = 'https://github.com/dmnfarrell/tablexplore'
+        link = 'https://github.com/xipeng-jin/tablexplore'
         webbrowser.open(link, autoraise=1)
         return
 
@@ -1072,6 +1072,7 @@ class Application(QMainWindow):
 
         text = 'Tablexplore Application\n' \
                + 'Version ' + __version__ + '\n' \
+               + 'Copyright (C) Xipeng Jin 2021-\n' \
                + 'Copyright (C) Damien Farrell 2018-\n' \
                + 'This program is free software; you can redistribute it and/or\n' \
                + 'modify it under the terms of the GNU General Public License ' \

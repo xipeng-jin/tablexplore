@@ -1040,7 +1040,7 @@ class PreferencesDialog(QDialog):
                        '%d-%b-%Y', '%b-%d-%Y',
                        '%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M',
                        '%d-%m-%Y %H:%M:%S', '%d-%m-%Y %H:%M']
-        self.opts = {'rowheight': {'type': 'spinbox', 'default': 18, 'range': (5, 50), 'label': 'row height'},
+        self.opts = {'rowheight': {'type': 'spinbox', 'default': 15, 'range': (5, 50), 'label': 'row height'},
                      'columnwidth': {'type': 'spinbox', 'range': (10, 300),
                                      'default': options['columnwidth'], 'label': 'column width'},
                      'alignment': {'type': 'combobox', 'default': 'w', 'items': ['left', 'right', 'center'],
