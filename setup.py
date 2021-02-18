@@ -16,13 +16,16 @@ setup(
     author_email = 'farrell.damien@gmail.com',
     packages = ['tablexplore'],
     package_data={'tablexplore': ['logo.png', '../description.txt',
-                                  'styles/*.qss','icons/*.png',
-                                  'plugins/*.py',
+                                  'styles/*.qss', 'icons/*.png',
+                                  'plugins/*.py', 'plugins/icons/*.png',
                                   'datasets/*.csv']},
     install_requires=['matplotlib>=3.0',
                       'pandas>=1.1',
                       'PySide2',
-                      'xlrd>=1.0'],
+                      'xlrd>=1.0'
+                       # uncomment below only for snap building
+                       # 'geopandas'
+                       ],
     entry_points = { 'gui_scripts': [
                      'tablexplore = tablexplore.app:main']},
     classifiers = ['Operating System :: OS Independent',

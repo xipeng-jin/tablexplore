@@ -128,12 +128,17 @@ def dialog_from_options(parent, opts, sections=None,
                 w.setTickPosition(QSlider.TicksBelow)
                 w.setValue(val)
             elif t == 'spinbox':
-                w = QSpinBox()
+                if type(val) is float:
+                    w = QDoubleSpinBox()
+                else:
+                    w = QSpinBox()
                 w.setValue(val)
                 if 'range' in opt:
                     min, max = opt['range']
                     w.setRange(min, max)
                     w.setMinimum(min)
+                if 'interval' in opt:
+                    w.setSingleStep(opt['interval'])
             elif t == 'checkbox':
                 w = QCheckBox()
                 w.setChecked(val)
@@ -181,7 +186,7 @@ def get_widget_values(widgets):
                 val = w.isChecked()
             elif type(w) is QSlider:
                 val = w.value()
-            elif type(w) is QSpinBox:
+            elif type(w) in [QSpinBox, QDoubleSpinBox]:
                 val = w.value()
             if val != None:
                 kwds[i] = val
@@ -209,7 +214,7 @@ def setWidgetValues(widgets, values):
                 w.setChecked(val)
             elif type(w) is QSlider:
                 w.setValue(val)
-            elif type(w) is QSpinBox:
+            elif type(w) in [QSpinBox, QDoubleSpinBox]:
                 w.setValue(val)
     return
 

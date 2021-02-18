@@ -31,6 +31,7 @@ from . import dialogs, plotting, util
 
 module_path = os.path.dirname(os.path.abspath(__file__))
 iconpath = os.path.join(module_path, 'icons')
+plugin_icon_path = os.path.join(module_path, 'plugins', 'icons')
 textalignment = None
 MODES = ['default', 'spreadsheet', 'locked']
 FONT = 'monospace'

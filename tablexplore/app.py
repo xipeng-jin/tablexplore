@@ -35,6 +35,7 @@ homepath = os.path.expanduser("~")
 module_path = os.path.dirname(os.path.abspath(__file__))
 stylepath = os.path.join(module_path, 'styles')
 iconpath = os.path.join(module_path, 'icons')
+plugin_icon_path = os.path.join(module_path, 'plugins', 'icons')
 
 
 class ProgressWidget(QDialog):
@@ -71,19 +72,19 @@ class Application(QMainWindow):
         self.setWindowTitle("DataExplore")
         self.setWindowIcon(QIcon(os.path.join(module_path, 'logo.png')))
         # Initialize menu bar
-        self.file_menu = QMenu(title='&File', parent=self)
+        self.file_menu = QMenu(title='File', parent=self)
         self.recent_files_menu = QMenu(title="Recent Projects", parent=self.file_menu)
         self.import_files_menu = QMenu(title="Import Files", parent=self.file_menu)
-        self.edit_menu = QMenu(title='&Edit', parent=self)
+        self.edit_menu = QMenu(title='Edit', parent=self)
         self.search_menu = QMenu(title='Search', parent=self.edit_menu)
-        self.view_menu = QMenu(title='&View', parent=self)
+        self.view_menu = QMenu(title='View', parent=self)
         self.style_menu = QMenu(title="Styles", parent=self.view_menu)
-        self.sheet_menu = QMenu(title='&Sheet', parent=self)
-        self.tools_menu = QMenu(title='&Tools', parent=self)
-        self.dataset_menu = QMenu(title='&Datasets', parent=self)
-        self.plots_menu = QMenu(title='&Plots', parent=self)
-        self.plugin_menu = QMenu(title='&Plugins', parent=self)
-        self.help_menu = QMenu(title='&Help', parent=self)
+        self.sheet_menu = QMenu(title='Sheet', parent=self)
+        self.tools_menu = QMenu(title='Tools', parent=self)
+        self.dataset_menu = QMenu(title='Datasets', parent=self)
+        self.plots_menu = QMenu(title='Plots', parent=self)
+        self.plugin_menu = QMenu(title='Plugins', parent=self)
+        self.help_menu = QMenu(title='Help', parent=self)
         self.create_menu()
 
         self.main = QTabWidget(self)
@@ -109,7 +110,6 @@ class Application(QMainWindow):
         self.recent_files = ['']
         self.recent_urls = []
         self.plots = {}
-        self.openplugins = {}
         self.filename = None
 
         self.load_settings()
@@ -216,94 +216,94 @@ class Application(QMainWindow):
 
         # File menu
         icon = QIcon(os.path.join(iconpath, 'document-new.png'))
-        self.file_menu.addAction(icon, '&New', lambda: self.new_project(ask=True),
+        self.file_menu.addAction(icon, 'New', lambda: self.new_project(ask=True),
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_N)
         icon = QIcon(os.path.join(iconpath, 'open.png'))
-        self.file_menu.addAction(icon, '&Open', self.open_project,
+        self.file_menu.addAction(icon, 'Open', self.open_project,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_O)
         self.file_menu.addAction(self.recent_files_menu.menuAction())
         icon = QIcon(os.path.join(iconpath, 'save.png'))
-        self.file_menu.addAction(icon, '&Save', self.save_project,
+        self.file_menu.addAction(icon, 'Save', self.save_project,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_S)
-        self.file_menu.addAction('&Save As', self.save_as_project)
+        self.file_menu.addAction('Save As', self.save_as_project)
         self.file_menu.addAction(self.import_files_menu.menuAction())
-        self.import_files_menu.addAction('&CSV...', self.import_csv_txt)
-        self.import_files_menu.addAction('&Excel...', self.import_excel)
-        self.import_files_menu.addAction('&HDF5...', self.importHDF)
-        self.import_files_menu.addAction('&URL...', self.importURL)
-        self.file_menu.addAction('&Export As', self.export_as)
+        self.import_files_menu.addAction('CSV...', self.import_csv_txt)
+        self.import_files_menu.addAction('Excel...', self.import_excel)
+        self.import_files_menu.addAction('HDF5...', self.importHDF)
+        self.import_files_menu.addAction('URL...', self.importURL)
+        self.file_menu.addAction('Export As', self.export_as)
         icon = QIcon(os.path.join(iconpath, 'application-exit.png'))
-        self.file_menu.addAction(icon, '&Quit', self.file_quit,
+        self.file_menu.addAction(icon, 'Quit', self.file_quit,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
         # Edit menu
         self.menuBar().addMenu(self.edit_menu)
-        self.undo_item = self.edit_menu.addAction('&Undo', self.undo,
+        self.undo_item = self.edit_menu.addAction('Undo', self.undo,
                                                   QtCore.Qt.CTRL + QtCore.Qt.Key_Z)
         self.edit_menu.addAction(self.search_menu.menuAction())
-        self.search_menu.addAction('&Local Search...', self.local_search)
-        self.search_menu.addAction('&Global Search...', self.global_search)
+        self.search_menu.addAction('Local Search...', self.local_search)
+        self.search_menu.addAction('Global Search...', self.global_search)
         # self.undo_item.setDisabled(True)
         # self.edit_menu.addAction('&Run Last Action', self.runLastAction)
         icon = QIcon(os.path.join(iconpath, 'preferences-system.png'))
-        self.edit_menu.addAction(icon, '&Preferences', self.preferences)
+        self.edit_menu.addAction(icon, 'Preferences', self.preferences)
 
         # View menu
         self.menuBar().addMenu(self.view_menu)
         icon = QIcon(os.path.join(iconpath, 'zoom-in.png'))
-        self.view_menu.addAction(icon, '&Zoom In', self.zoomIn,
+        self.view_menu.addAction(icon, 'Zoom In', self.zoomIn,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_Equal)
         icon = QIcon(os.path.join(iconpath, 'zoom-out.png'))
-        self.view_menu.addAction(icon, '&Zoom Out', self.zoomOut,
+        self.view_menu.addAction(icon, 'Zoom Out', self.zoomOut,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_Minus)
         icon = QIcon(os.path.join(iconpath, 'decrease-width.png'))
-        self.view_menu.addAction(icon, '&Decrease Column Width', lambda: self.changeColumnWidths(.9))
+        self.view_menu.addAction(icon, 'Decrease Column Width', lambda: self.changeColumnWidths(.9))
         icon = QIcon(os.path.join(iconpath, 'increase-width.png'))
-        self.view_menu.addAction(icon, '&Increase Column Width', self.changeColumnWidths)
+        self.view_menu.addAction(icon, 'Increase Column Width', self.changeColumnWidths)
         # Style menu
-        self.style_menu.addAction('&Default', self.set_style)
-        self.style_menu.addAction('&Light', lambda: self.set_style('light'))
-        self.style_menu.addAction('&Dark', lambda: self.set_style('dark'))
+        self.style_menu.addAction('Default', self.set_style)
+        self.style_menu.addAction('Light', lambda: self.set_style('light'))
+        self.style_menu.addAction('Dark', lambda: self.set_style('dark'))
         self.view_menu.addAction(self.style_menu.menuAction())
 
         # Sheet menu
         self.menuBar().addMenu(self.sheet_menu)
         icon = QIcon(os.path.join(iconpath, 'add.png'))
-        self.sheet_menu.addAction(icon, '&Add', self.add_sheet)
-        self.sheet_menu.addAction('&Rename', self.rename_sheet)
+        self.sheet_menu.addAction(icon, 'Add', self.add_sheet)
+        self.sheet_menu.addAction('Rename', self.rename_sheet)
         icon = QIcon(os.path.join(iconpath, 'copy.png'))
-        self.sheet_menu.addAction(icon, '&Copy', self.copy_sheet)
+        self.sheet_menu.addAction(icon, 'Copy', self.copy_sheet)
 
         # Tools menu
         icon = QIcon(os.path.join(iconpath, 'tableinfo.png'))
-        self.tools_menu.addAction(icon, '&Table Info', lambda: self._call('info'),
+        self.tools_menu.addAction(icon, 'Table Info', lambda: self._call('info'),
                                   QtCore.Qt.CTRL + QtCore.Qt.Key_I)
         icon = QIcon(os.path.join(iconpath, 'clean.png'))
-        self.tools_menu.addAction(icon, '&Clean Data', lambda: self._call('cleanData'))
+        self.tools_menu.addAction(icon, 'Clean Data', lambda: self._call('cleanData'))
         icon = QIcon(os.path.join(iconpath, 'table-duplicates.png'))
-        self.tools_menu.addAction(icon, '&Find Duplicates', lambda: self._call('findDuplicates'))
-        self.tools_menu.addAction('&Convert Numeric', lambda: self._call('convertNumeric'))
-        self.tools_menu.addAction('&Convert Column Names', lambda: self._call('convertColumnNames'))
-        self.tools_menu.addAction('&Time Series Resample', lambda: self._call('resample'))
+        self.tools_menu.addAction(icon, 'Find Duplicates', lambda: self._call('findDuplicates'))
+        self.tools_menu.addAction('Convert Numeric', lambda: self._call('convertNumeric'))
+        self.tools_menu.addAction('Convert Column Names', lambda: self._call('convertColumnNames'))
+        self.tools_menu.addAction('Time Series Resample', lambda: self._call('resample'))
         icon = QIcon(os.path.join(iconpath, 'tabletotext.png'))
-        self.tools_menu.addAction(icon, '&Table to Text', lambda: self._call('showAsText'),
+        self.tools_menu.addAction(icon, 'Table to Text', lambda: self._call('showAsText'),
                                   QtCore.Qt.CTRL + QtCore.Qt.Key_T)
         icon = QIcon(os.path.join(iconpath, 'interpreter.png'))
-        self.tools_menu.addAction(icon, '&Python Interpreter', self.interpreter)
+        self.tools_menu.addAction(icon, 'Python Interpreter', self.interpreter)
         self.menuBar().addMenu(self.tools_menu)
 
         # Datasets menu
         self.menuBar().addMenu(self.dataset_menu)
-        self.dataset_menu.addAction('&Sample', lambda: self.get_sample_data('sample'))
-        self.dataset_menu.addAction('&Iris', lambda: self.get_sample_data('iris'))
-        self.dataset_menu.addAction('&Titanic', lambda: self.get_sample_data('titanic'))
-        self.dataset_menu.addAction('&Pima Diabetes', lambda: self.get_sample_data('pima'))
+        self.dataset_menu.addAction('Sample', lambda: self.get_sample_data('sample'))
+        self.dataset_menu.addAction('Iris', lambda: self.get_sample_data('iris'))
+        self.dataset_menu.addAction('Titanic', lambda: self.get_sample_data('titanic'))
+        self.dataset_menu.addAction('Pima Diabetes', lambda: self.get_sample_data('pima'))
 
         # Plots menu
         self.menuBar().addMenu(self.plots_menu)
-        self.plots_menu.addAction('&Store Plot', lambda: self.store_plot())
-        self.plots_menu.addAction('&Show Plots', lambda: self.show_plot_gallery())
+        self.plots_menu.addAction('Store Plot', lambda: self.store_plot())
+        self.plots_menu.addAction('Show Plots', lambda: self.show_plot_gallery())
 
         # Plugin menu
         self.menuBar().addMenu(self.plugin_menu)
@@ -313,7 +313,7 @@ class Application(QMainWindow):
         self.menuBar().addSeparator()
         self.menuBar().addMenu(self.help_menu)
         icon = QIcon(os.path.join(iconpath, 'logo.png'))
-        self.help_menu.addAction(icon, '&About', self.about)
+        self.help_menu.addAction(icon, 'About', self.about)
 
         # plot shortcut
         self.plotshc = QShortcut(QKeySequence('Ctrl+P'), self)
@@ -986,8 +986,6 @@ class Application(QMainWindow):
         from . import plugin
         default = os.path.join(module_path, 'plugins')
         paths = [default]
-        # paths = [apppath,self.configpath]
-
         failed = plugin.init_plugin_system(paths)
         self.update_plugin_menu()
         return
@@ -998,39 +996,46 @@ class Application(QMainWindow):
         index = self.main.currentIndex()
         name = self.main.tabText(index)
         tablew = self.sheets[name]
+        if not hasattr(tablew, 'openplugins'):
+            tablew.openplugins = {}
+        openplugins = tablew.openplugins
 
-        p = plugin()
-        # plugin should be added to the splitter as a dock widget
-        # should also be able to add standalone windows
-        try:
-            p.main(parent=self, table=tablew)
-        except Exception as e:
-            QMessageBox.information(self, "Plugin error", str(e))
+        if plugin.name in openplugins:
+            p = openplugins[plugin.name]
+            p.main.show()
+        else:
+            # plugin should be added to the splitter as a dock widget
+            # should also be able to add standalone windows
+            try:
+                p = plugin(parent=self, table=tablew)
+                # track which plugin is running
+                openplugins[plugin.name] = p
+            except Exception as e:
+                QMessageBox.information(self, "Plugin error", str(e))
 
-        tablew.splitter.addWidget(p.mainwin)
-        index = tablew.splitter.indexOf(p.mainwin)
-        tablew.splitter.setCollapsible(index, False)
+            tablew.splitter.addWidget(p.main)
+            index = tablew.splitter.indexOf(p.main)
+            tablew.splitter.setCollapsible(index, False)
 
-        # track which plugin is running so the last one is removed?
-        self.openplugins[name] = p
         return
 
     def update_plugin_menu(self):
         """Update plugins"""
 
         from . import plugin
-        # self.plugin_menu['var'].delete(3, self.plugin_menu['var'].index(END))
         plgmenu = self.plugin_menu
         for plg in plugin.get_plugins_classes('gui'):
+
             def func(p, **kwargs):
                 def new():
                     self.load_plugin(p)
 
                 return new
-
-            # plgmenu.add_command(label=plg.menuentry,
-            #                   command=func(plg))
-            plgmenu.addAction(plg.menuentry, func(plg))
+            if hasattr(plg, 'iconfile'):
+                icon = QIcon(os.path.join(plugin_icon_path, plg.iconfile))
+                plgmenu.addAction(icon, plg.menuentry, func(plg))
+            else:
+                plgmenu.addAction(plg.menuentry, func(plg))
         return
 
     def preferences(self):
