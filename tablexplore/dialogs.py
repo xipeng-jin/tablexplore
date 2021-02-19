@@ -295,9 +295,10 @@ class TextDialog(QDialog):
 class SearchDialog(QDialog):
     """Search dialog"""
 
-    def __init__(self, parent, sheets):
+    def __init__(self, parent, sheets, names):
         super(SearchDialog, self).__init__(parent)
         self.sheets = sheets
+        self.names = names
         self.resize(1000, 500)
         self.setWindowTitle("Search")
         layout = QVBoxLayout(self)
@@ -309,6 +310,24 @@ class SearchDialog(QDialog):
         tw_hbox.addWidget(self.searchbox, stretch=1)
         self.resultbox = PlainTextEditor(self)
         tw_hbox.addWidget(self.resultbox, stretch=3)
+
+        # Create search option widget
+        self.opts = {
+            "operator": {'type': 'combobox', 'default': 'OR',
+                         'items': ['OR', 'AND'],
+                         'label': 'Operator'},
+            "case": {'type': 'combobox', 'default': 'No',
+                     'items': ['Yes', 'No'],
+                     'label': 'Case'},
+            "word": {'type': 'combobox', 'default': 'No',
+                     'items': ['Yes', 'No'],
+                     'label': 'Word'},
+            "regex": {'type': 'combobox', 'default': 'No',
+                      'items': ['Yes', 'No'],
+                      'label': 'Regex'},
+        }
+        dialog, self.widgets = dialog_from_options(self, self.opts)
+        tw_hbox.addWidget(dialog)
         layout.addWidget(tw)
 
         # Create button widget
@@ -316,6 +335,9 @@ class SearchDialog(QDialog):
         bw_hbox = QHBoxLayout(bw)
         button = QPushButton("Search")
         button.clicked.connect(self.search)
+        bw_hbox.addWidget(button)
+        button = QPushButton("Clear")
+        button.clicked.connect(self.clear)
         bw_hbox.addWidget(button)
         button = QPushButton("Close")
         button.clicked.connect(self.close)
@@ -328,24 +350,51 @@ class SearchDialog(QDialog):
     def search(self):
         searchbox_val = self.searchbox.toPlainText()
         keywords = searchbox_val.splitlines()
+        self.resultbox.clear()
         if type(self.sheets) is not OrderedDict:
             df = self.sheets.dataframe
-            result = df[df.stack().str.contains("|".join(keywords)).any(level=0)]
-            self.resultbox.setPlainText(result.to_string())
+            self._search_func(keywords, self.names, df)
         else:
-            self.resultbox.clear()
-            names = list(self.sheets.keys())
-            for name in names:
+            for name in self.names:
                 df = self.sheets[name].dataframe
                 if df is not None:
-                    result = df[df.stack().str.contains("|".join(keywords)).any(level=0)]
-                    self.resultbox.insertPlainText(f"# {name}:\n")
-                    if result.empty:
-                        self.resultbox.insertPlainText("Not found!")
-                    else:
-                        self.resultbox.insertPlainText(result.to_string())
-                    self.resultbox.insertPlainText("\n\n")
+                    self._search_func(keywords, name, df)
         return
+
+    def clear(self):
+        self.searchbox.clear()
+        self.resultbox.clear()
+        return
+
+    def _search_func(self, keywords, name, df):
+        kwds = get_widget_values(self.widgets)
+        if kwds["regex"] == "Yes":
+            regex = self.searchbox.toPlainText()
+        else:
+            if kwds["operator"] == "OR" and kwds["word"] == "Yes":
+                regex = ''.join([f'\\b{keyword}\\b|' for keyword in keywords])
+                regex = regex[0:-1]
+            elif kwds["operator"] == "OR" and kwds["word"] == "No":
+                regex = '|'.join(keywords)
+            elif kwds["operator"] == "AND" and kwds["word"] == "Yes":
+                regex = ''.join([f'(?=.*\\b{keyword}\\b)' for keyword in keywords])
+            elif kwds["operator"] == "AND" and kwds["word"] == "No":
+                regex = ''.join([f'(?=.*{keyword})' for keyword in keywords])
+            else:
+                regex = '|'.join(keywords)
+
+        if kwds["case"] == "Yes":
+            result = df[df.stack().str.contains(regex, case=True).any(level=0)]
+        else:
+            result = df[df.stack().str.contains(regex, case=False).any(level=0)]
+
+        self.resultbox.insertPlainText(f"# {name}:\n")
+        if result.empty:
+            self.resultbox.insertPlainText("Not found!")
+        else:
+            self.resultbox.insertPlainText(result.to_string())
+        self.resultbox.insertPlainText("\n\n")
+        return result
 
 
 class MultipleInputDialog(QDialog):

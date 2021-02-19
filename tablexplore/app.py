@@ -914,15 +914,18 @@ class Application(QMainWindow):
     def local_search(self):
         """Search keywords in current sheet"""
 
-        w = self.get_current_table()
-        dlg = dialogs.SearchDialog(self, sheets=w)
+        idx = self.main.currentIndex()
+        name = self.main.tabText(idx)
+        table = self.sheets[name]
+        dlg = dialogs.SearchDialog(self, sheets=table, names=name)
         dlg.exec_()
         return
 
     def global_search(self):
         """Search keywords in all sheets in project"""
 
-        dlg = dialogs.SearchDialog(self, sheets=self.sheets)
+        names = list(self.sheets.keys())
+        dlg = dialogs.SearchDialog(self, sheets=self.sheets, names=names)
         dlg.exec_()
         return
 
