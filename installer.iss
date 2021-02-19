@@ -6,8 +6,8 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{82B97831-C1C9-4954-83EF-6DFA21D9E5F1}
 AppName=Tablexplore
-AppVersion=0.2.0
-;AppVerName=Tablexplore 0.2.0
+AppVersion=0.4.0
+;AppVerName=Tablexplore 0.4.0
 AppPublisher=Xipeng Jin, Damien Farrell
 AppPublisherURL=https://dmnfarrell.github.io/tablexplore/
 AppSupportURL=https://dmnfarrell.github.io/tablexplore/
