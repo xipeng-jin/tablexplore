@@ -302,6 +302,7 @@ class Application(QMainWindow):
 
         # Plots menu
         self.menuBar().addMenu(self.plots_menu)
+        self.plots_menu.addAction('Global Plot')
         self.plots_menu.addAction('Store Plot', lambda: self.store_plot())
         self.plots_menu.addAction('Show Plots', lambda: self.show_plot_gallery())
 

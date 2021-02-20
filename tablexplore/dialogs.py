@@ -307,8 +307,11 @@ class SearchDialog(QDialog):
         tw = QWidget(parent)
         tw_hbox = QHBoxLayout(tw)
         self.searchbox = PlainTextEditor(self)
+        self.searchbox.setLineWrapMode(QPlainTextEdit.NoWrap)
         tw_hbox.addWidget(self.searchbox, stretch=1)
         self.resultbox = PlainTextEditor(self)
+        self.resultbox.setLineWrapMode(QPlainTextEdit.NoWrap)
+        self.resultbox.setReadOnly(True)
         tw_hbox.addWidget(self.resultbox, stretch=3)
 
         # Create search option widget
@@ -367,6 +370,8 @@ class SearchDialog(QDialog):
         return
 
     def _search_func(self, keywords, name, df):
+        # Convert all columns type to string
+        df = df[list(df)].astype(str)
         kwds = get_widget_values(self.widgets)
         if kwds["regex"] == "Yes":
             regex = self.searchbox.toPlainText()
